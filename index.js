@@ -6,7 +6,7 @@ var db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "seecs123",
-    database: "nodeapp"
+    database: "lyaen"
 });
 
 db.connect(function(err){
@@ -14,6 +14,10 @@ db.connect(function(err){
     console.log("Connected");
 });
 app.use(express.json());
+
+app.get('/',function(req, res){
+    res.send("Welcome to Lyaen API.");
+});
 
 app.get('/users', function (req, res) {
     var sql = "select * from users;";
@@ -26,8 +30,8 @@ app.get('/users', function (req, res) {
 });
 
 app.get('/users/:uid', function(req, res){
-    var UID = req.params.uid;
-    var sql = "select * from users where ID=" + UID;
+    var uid = req.params.uid;
+    var sql = "select * from users where ID=" + uid;
     db.query(sql, function(err, result, fields){
         if (err) throw err;
         if (result.length > 0) res.send(result);
@@ -45,10 +49,20 @@ app.get('/visits', function (req, res) {
     //res.end();
 });
 
+app.get('/visits/:vid', function (req, res) {
+    var vid = req.params.vid;
+    var sql = "select * from visits WHERE ID = " + vid;
+    db.query(sql, function(err, result, fields){
+        if (err) throw err;
+        if (result.length > 0) res.send(result);
+        else res.send("No visit found!");
+    })
+    //res.end();
+});
+
 app.get('/users/:uid/visits', function(req, res){
-    var UID = req.params.uid;
-    console.log(UID);
-    var sql = "select * from visits where UID=" + UID;
+    var uid = req.params.uid;
+    var sql = "select * from visits where UID=" + uid;
     db.query(sql, function(err, result, fields){
         if (err) throw err;
         if (result.length > 0) res.send(result);
@@ -57,16 +71,26 @@ app.get('/users/:uid/visits', function(req, res){
 });
 
 app.get('/users/:uid/visits/:vid', function(req, res){
-    var UID = req.params.uid;
-    var VID = req.params.vid
-    console.log(UID);
-    var sql = "select * from visits where UID=" + UID + " and ID=" + VID;
+    var uid = req.params.uid;
+    var vid = req.params.vid
+    var sql = "select * from visits where UID=" + uid + " and ID=" + vid;
     db.query(sql, function(err, result, fields){
         if (err) throw err;
         if (result.length > 0) res.send(result);
         else res.send("No visit by you with given Visit ID!");
     });
 });
+
+app.get('/users/:uid/visits/:vid/requests', function(req, res){
+    var vid = req.params.vid;
+    var sql = "select * from requests where VID = " + vid;
+    db.query(sql, function(err, result, fields){
+        if (err) throw err;
+        if (result.length > 0) res.send(result);
+        else res.send("No Requests on your visit till now!");
+    });
+});
+
 
 app.get('/requests', function (req, res) {
     var sql = "select * from requests;";
@@ -79,8 +103,8 @@ app.get('/requests', function (req, res) {
 });
 
 app.get('/users/:uid/requests', function(req, res){
-    var UID = req.params.uid;
-    var sql = "select * from requests where UID=" + UID;
+    var uid = req.params.uid;
+    var sql = "select * from requests where UID=" + uid;
     db.query(sql, function(err, result, fields){
         if (err) throw err;
         if (result.length > 0) res.send(result);
@@ -89,9 +113,9 @@ app.get('/users/:uid/requests', function(req, res){
 });
 
 app.get('/users/:uid/requests/:rid', function(req, res){
-    var UID = req.params.uid;
-    var RID = req.params.rid;
-    var sql = "select * from requests where UID=" + UID + " and ID=" + RID;
+    var uid = req.params.uid;
+    var rid = req.params.rid;
+    var sql = "select * from requests where UID=" + uid + " and ID=" + rid;
     db.query(sql, function(err, result, fields){
         if (err) throw err;
         if (result.length > 0) res.send(result);
@@ -109,11 +133,11 @@ app.post('/users',function(req, res){
 });
 
 app.post('/users/:uid/visit', function(req, res){
-    var UID = req.params.uid;
+    var uid = req.params.uid;
     var description = req.body.description;
     var destination = req.body.destination;
     var timestamp = req.body.timestamp;
-    var sql = "INSERT into visits (Description, Destination, Timestamp, UID) values ('" + description + "','" + destination + "','" + timestamp + "'," + UID +");";
+    var sql = "INSERT into visits (Description, Destination, Timestamp, UID) values ('" + description + "','" + destination + "','" + timestamp + "'," + uid +");";
     db.query(sql, function(err, result){
         if (err) throw err;
         res.send("Your visit is registered!");
@@ -121,13 +145,69 @@ app.post('/users/:uid/visit', function(req, res){
 });
 
 app.post('/visits/:vid/request', function(req, res){
-    var VID = req.params.vid;
+    var vid = req.params.vid;
     var description = req.body.description;
-    var UID = req.body.uid;
-    var sql = "INSERT into requests (Description, UID, VID) values ('"+ description +"',"+ UID +"," + VID + ");";
+    var uid = req.body.uid;
+    var sql = "INSERT into requests (Description, UID, VID) values ('"+ description +"',"+ uid +"," + vid + ");";
     db.query(sql, function(err, result){
         if (err) throw err;
-        res.send("Your Request to visit having ID "+ VID + " submitted successfully!");
+        res.send("Your Request to visit having ID "+ vid + " submitted successfully!");
+    });
+});
+
+app.put('/users/:uid/visits/:vid/requests/:rid', function(req, res){
+    var rid = req.params.rid;
+    var status = req.body.status;
+    var sql = "UPDATE requests SET status = '" + status + "' WHERE ID = " + rid;
+    db.query(sql, function(err, result){
+        if (err) throw err;
+        res.send("Request Status Updated!");
+    });
+});
+
+app.put('/users/:uid/visits/:vid', function(req, res){
+    var uid = req.params.uid;
+    var vid = req.params.vid;
+    var status = req.body.status;
+    var sql = "SELECT count(*) as notavailable from requests WHERE status = 'Not Available' and VID = " + vid;
+    db.query(sql, function(err, result, fields){
+        if (err) throw err;
+        var na_requests = result[0]["notavailable"];
+        if (na_requests > 0){
+            res.send("Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit.")
+        }
+        else {
+            var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = " + vid;
+            db.query(sql, function(err, result, fields){
+                if (err) throw err;
+                var completed_requests = result[0]["completed"];
+                console.log(completed_requests);
+                if (completed_requests > 0){
+                    var points = (completed_requests * 5) + 5; 
+                    var sql = "UPDATE users SET points = " + points + " WHERE ID = " + uid;
+                    db.query(sql, function(err, result){
+                        if (err) throw err;
+                        res.send("Visit Status Updated!")
+                    })
+                }
+                var sql = "UPDATE visits SET status = '" + status + "' WHERE ID = " + vid;
+                db.query(sql, function(err, result){
+                    if (err) throw err;
+                    res.send("Visit Status Updated!");
+                });
+            });        
+        }
+    });
+});
+
+app.put('/users/:uid/requests/:rid', function(req, res){
+    var uid = req.params.uid;
+    var rid = req.params.rid;
+    var status = req.body.status;
+    var sql = "UPDATE requests SET status = '" + status + "' WHERE ID = " + rid;
+    db.query(sql, function(err, result){
+        if (err) throw err;
+        res.send("Request Status Updated!");
     });
 });
 
