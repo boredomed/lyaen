@@ -1,5 +1,10 @@
 var express = require('express');
 var mysql = require('mysql');
+var bcrypt = require('bcrypt');
+var session = require('express-session');
+var redis = require('redis');
+var redisStore = require('connect-redis')(session);
+var client = redis.createClient();
 var app = express();
 
 var db = mysql.createConnection({
@@ -13,17 +18,126 @@ db.connect(function (err) {
     if (err) throw err;
     console.log("Connected");
 });
+
+function validateEmail(email) {
+    var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(String(email).toLowerCase());
+}
+
+function validateName(name) {
+    var regex = /^[A-Za-z ]+$/;
+    return regex.test(String(name).toLowerCase());
+}
+
+
 app.use(express.json());
+
+client.auth("seecs123");
+app.use(session({
+    secret: 'seecs123',
+    saveUninitialized: true,
+    resave: false,
+    store: new redisStore({
+        host: "localhost",
+        port: 6379,
+        ttl: 300,
+        client: client
+    }),
+}));
+
+app.post('/signin', function (req, res) {
+    let email = req.body.email;
+    let pwd = req.body.pwd;
+    if (validateEmail(email)) {
+        let sql = "SELECT ID, Pwd as hash from users WHERE Email = ?;";
+        db.query(sql, [email], function (err, result) {
+            if (result.length > 0) {
+                var hash = result[0]["hash"];
+                var uid = result[0]["ID"];
+                bcrypt.compare(pwd, hash, function (err, response) {
+                    if (response) {
+                        req.session.user = uid;
+                        res.status(200).send({ "status": true, "Message": "Access Granted!" });
+                    }
+                    else {
+                        res.status(200).send({ "status": false, "Message": "Access Denied!" });
+                    }
+                });
+            }
+            else {
+                res.status(200).send({ "status": true, "Message": "Access Denied!" })
+            }
+        });
+    }
+    else {
+        res.status(400).send({ "Message": "Invalid Email!" });
+    }
+});
+
+app.post('/signup', function (req, res) {
+    var name = req.body.name;
+    var email = req.body.email;
+    var pwd = req.body.pwd;
+    var cpwd = req.body.cpwd;
+    if (validateName(name)) {
+        if (validateEmail(email)) {
+            var sql = "SELECT * from users WHERE Email = ?;";
+            db.query(sql, [email], function (err, result) {
+                if (result.length > 0) {
+                    res.status(200).send({ "status": false, "Message": "Sorry! Email is already in use!" });
+                }
+                else {
+                    if (pwd == cpwd) {
+                        var saltRounds = 10;
+                        bcrypt.hash(pwd, saltRounds, function (err, hash) {
+                            var sql = "INSERT into users (Name, Email, Pwd) values (?, ?, ?);";
+                            db.query(sql, [name, email, hash], function (err, result) {
+                                if (err) throw err;
+                                res.status(200).send({ "Message": "Sign Up Successful!" });
+                            });
+                        });
+                    }
+                    else {
+                        res.status(200).send({ "status": false, "Message": "Passwords DoNot Match!" });
+                    }
+                }
+            });
+
+        }
+        else {
+            res.status(400).send({ "Message": "Invalid Email!" });
+        }
+    }
+    else {
+        res.status(400).send({ "Message": "Name can only contains Spaces or Alphabets!" });
+    }
+});
 
 app.get('/', function (req, res) {
     res.send("Welcome to Lyaen API.");
 });
 
+app.use(function (req, res, next) {
+    if (req.session.user) {
+        next();
+    }
+    else {
+        res.status(401).send({ "Message": "Authentication Required!" });
+    }
+})
+
+app.get('/logout', function (req, res) {
+    req.session.destroy((err) => {
+        if (err) throw err;
+        res.status(200).send({ "status": true });
+    });
+});
+
 app.get('/users', function (req, res) {
-    var sql = "select * from users;";
+    var sql = "select ID, Name, Email, Points from users;";
     db.query(sql, function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).send(result);
     })
     //res.end();
 });
@@ -33,7 +147,7 @@ app.get('/users/:uid', function (req, res) {
     var sql = "select * from users where ID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).send(result);
     });
 });
 
@@ -41,7 +155,7 @@ app.get('/visits', function (req, res) {
     var sql = "select * from visits where status<>'Completed' ;";
     db.query(sql, function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).send(result);
     })
     //res.end();
 });
@@ -51,7 +165,7 @@ app.get('/visits/:vid', function (req, res) {
     var sql = "select * from visits WHERE ID = ?;";
     db.query(sql, [vid], function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).send(result);
     })
     //res.end();
 });
@@ -61,7 +175,7 @@ app.get('/users/:uid/visits', function (req, res) {
     var sql = "select * from visits where UID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).send(result);
     });
 });
 
@@ -71,7 +185,7 @@ app.get('/users/:uid/visits/:vid', function (req, res) {
     var sql = "select * from visits where UID = ? and ID = ?;";
     db.query(sql, [uid, vid], function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).send(result);
     });
 });
 
@@ -80,7 +194,7 @@ app.get('/users/:uid/visits/:vid/requests', function (req, res) {
     var sql = "select * from requests where VID = ?;";
     db.query(sql, [vid], function (err, result) {
         if (err) throw err;
-        res.send(result);
+        res.status(200).send(result);
     });
 });
 
@@ -100,8 +214,7 @@ app.get('/users/:uid/requests', function (req, res) {
     var sql = "select * from requests where UID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
-        if (result.length > 0) res.send(result);
-        else res.send("No request by you found!");
+        res.status(200).send(result);
     });
 });
 
@@ -111,19 +224,18 @@ app.get('/users/:uid/requests/:rid', function (req, res) {
     var sql = "select * from requests where UID = ? and ID = ?;";
     db.query(sql, [uid, rid], function (err, result) {
         if (err) throw err;
-        if (result.length > 0) res.send(result);
-        else res.send("No request by you with given Request ID!");
+        res.status(200).send(result);
     });
 });
 
-app.post('/users', function (req, res) {
-    var name = req.body.name;
-    var sql = "INSERT into users (Name) values (?);";
-    db.query(sql, [name], function (err, result) {
-        if (err) throw err;
-        res.send("User added Successfully!");
-    });
-});
+// app.post('/users', function (req, res) {
+//     var name = req.body.name;
+//     var sql = "INSERT into users (Name) values (?);";
+//     db.query(sql, [name], function (err, result) {
+//         if (err) throw err;
+//         res.send("User added Successfully!");
+//     });
+// });
 
 app.post('/users/:uid/visit', function (req, res) {
     var uid = req.params.uid;
@@ -133,7 +245,7 @@ app.post('/users/:uid/visit', function (req, res) {
     var sql = "INSERT into visits (Description, Destination, Timestamp, UID) values (?, ?, ?, ?);";
     db.query(sql, [description, destination, timestamp, uid], function (err, result) {
         if (err) throw err;
-        res.send("Your visit is registered!");
+        res.status(200).send({ "Message": "Your visit is registered!" });
     });
 });
 
@@ -144,7 +256,7 @@ app.post('/visits/:vid/request', function (req, res) {
     var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
     db.query(sql, [description, vid, uid], function (err, result) {
         if (err) throw err;
-        res.send("Your Request to visit having ID " + vid + " submitted successfully!");
+        res.status(200).send({ "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
     });
 });
 
@@ -154,7 +266,7 @@ app.put('/users/:uid/visits/:vid/requests/:rid', function (req, res) {
     var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
     db.query(sql, [status, rid], function (err, result) {
         if (err) throw err;
-        res.send("Request Status Updated!");
+        res.status(200).send({ "Message": "Request Status Updated!" });
     });
 });
 
@@ -167,7 +279,7 @@ app.put('/users/:uid/visits/:vid', function (req, res) {
         if (err) throw err;
         var na_requests = result[0]["notavailable"];
         if (na_requests > 0) {
-            res.send("Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit.")
+            res.status(200).send({ "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
         }
         else {
             var sql = "SELECT points from users WHERE ID = ?;";
@@ -187,7 +299,7 @@ app.put('/users/:uid/visits/:vid', function (req, res) {
                             var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
                             db.query(sql, [status, vid], function (err, result) {
                                 if (err) throw err;
-                                res.send("Visit Status Updated!");
+                                res.status(200).send({ "Message": "Visit Status Updated!" });
                             });
                         });
                     }
@@ -204,7 +316,7 @@ app.put('/users/:uid/requests/:rid', function (req, res) {
     var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
     db.query(sql, [status, rid], function (err, result) {
         if (err) throw err;
-        res.send("Request Status Updated!");
+        res.status(200).send({ "Message": "Request Status Updated!" });
     });
 });
 
