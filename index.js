@@ -1,260 +1,328 @@
 var express = require('express');
-var app = express();
-var session = require('express-session');
-var router = express.Router();
 var mysql = require('mysql');
+var bcrypt = require('bcrypt');
+var session = require('express-session');
+var redis = require('redis');
+var redisStore = require('connect-redis')(session);
+var client = redis.createClient();
+var app = express();
 var cors = require('cors');
-
 app.use(cors());
-//const bcrypt = require('bcrypt');
-var bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
+
+var db = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "seecs@123",
+    database: "nodeapp"
+});
+
+db.connect(function (err) {
+    if (err) throw err;
+    console.log("Connected");
+});
+
+function validateEmail(email) {
+    var regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(String(email).toLowerCase());
+}
+
+function validateName(name) {
+    var regex = /^[A-Za-z ]+$/;
+    return regex.test(String(name).toLowerCase());
+}
+
+app.use(express.json());
+
+//client.auth("seecs123");
+app.use(session({
+    secret: 'seecs123',
+    saveUninitialized: true,
+    resave: false,
+    store: new redisStore({
+        host: "localhost",
+        port: 6379,
+        ttl: 300,
+        client: client
+    }),
 }));
 
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'seecs@123',
-  database: 'nodeapp'
-});
+app.use('/', express.static('views'));
 
-//connection created
-db.connect(function (err) {
-  if (err) throw err;
-  console.log('Connected to database');
-});
-
-//signup
-app.post('/signup', function(req, res){
-
-  function validateEmail(email) {
-    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-  }
-
-  function validateName(name){
-    var re1 = /^[a-zA-Z ]{2,30}$/;
-    return re1.test(name);
-  }
-  
-  let name = req.body.name;
-  let email = req.body.email;
-  let password = req.body.password;
-
-  console.log("name ----------");
-  console.log(req.body.name);  
-  console.log(req.headers);
-
-    if(validateEmail(email) && validateName(name)){
-      let quer = "Insert into users (Name, Email, Pwd) VALUES(?,?,?)";
-  
-      db.query(quer,[name, email, password], function (err, result) {
-        if (err) throw err;
-        console.log("Inserted");
-        res.send(result);
-      });  
+app.post('/signin', function (req, res) {
+    let email = req.body.email;
+    let pwd = req.body.pwd;
+    if (validateEmail(email)) {
+        let sql = "SELECT ID, Pwd as hash from users WHERE Email = ?;";
+        db.query(sql, [email], function (err, result) {
+            if (result.length > 0) {
+                var hash = result[0]["hash"];
+                var uid = result[0]["ID"];
+                bcrypt.compare(pwd, hash, function (err, response) {
+                    if (response) {
+                        req.session.user = uid;
+                        res.status(200).send({ "status": true, "Message": "Access Granted!" });
+                    }
+                    else {
+                        res.status(200).send({ "status": false, "Message": "Access Denied!" });
+                    }
+                });
+            }
+            else {
+                res.status(200).send({ "status": true, "Message": "Access Denied!" })
+            }
+        });
     }
-    else{
-      console.log("Wrong format");
-      res.send({name: "ahmad"});
+    else {
+        res.status(400).send({ "Message": "Invalid Email!" });
     }
 });
 
-//creating user
-app.post('/users', function (req, res) {
-  let name = req.body.name;
+app.post('/signup', function (req, res) {
+    var name = req.body.name;
+    var email = req.body.email;
+    var pwd = req.body.pwd1;
+    var cpwd = req.body.cpwd;
+    console.log(name);
+    if (validateName(name)) {
+        if (validateEmail(email)) {
+            var sql = "SELECT * from users WHERE Email = ?;";
+            db.query(sql, [email], function (err, result) {
+                if (result.length > 0) {
+                    res.status(200).send({ "status": false, "Message": "Sorry! Email is already in use!" });
+                }
+                else {
+                    if (pwd == cpwd) {
+                        var saltRounds = 10;
+                        bcrypt.hash(pwd, saltRounds, function (err, hash) {
+                            var sql = "INSERT into users (Name, Email, Pwd) values (?, ?, ?);";
+                            db.query(sql, [name, email, hash], function (err, result) {
+                                if (err) throw err;
+                                res.status(200).send({ "Message": "Sign Up Successful!" });
+                            });
+                        });
+                    }
+                    else {
+                        res.status(200).send({ "status": false, "Message": "Passwords DoNot Match!" });
+                    }
+                }
+            });
 
-  let quer = "Insert into users (Name) VALUES(?)";
-  db.query(quer,[name], function (err, result) {
-    if (err) throw err;
-    res.send("User created");
-  });
-
+        }
+        else {
+            res.status(400).send({ "Message": "Invalid Email!" });
+        }
+    }
+    else {
+        res.status(400).send({ "Message": "Name can only contains Spaces or Alphabets!" });
+    }
 });
 
-//all users
-app.get('/users', function (req, res) {
-  db.query("Select * from users", function (err, result) {
-
-    if (err) throw err
-    res.send(result);
-  });
+app.get('/', function (req, res) {
+    res.send("Welcome to Lyaen API.");
 });
 
-//getting a particular user
-app.get('/users/:id', function (req, res) {
-  let id = req.params.id;
-  let quer = "Select * from users where ID = ?";
-  db.query(quer,[id], function (err, result) {
+app.use(function (req, res, next) {
+    if (req.session.user) {
+        next();
+    }
+    else {
+        res.status(401).send({ "Message": "Authentication Required!" });
+    }
+})
 
-    if (err) throw err
-    res.send(result);
-  });
-
-});
-
-//Visitors Code
-//getting all visits data
 app.get('/visits', function (req, res) {
-  db.query("Select * from visits where Status != 'Completed'", function (err, result) {
-    if (err) throw err;
-    res.send(result);
-  });
-});
-
-//posting a visits
-app.post('/users/:uid/visit', function (req, res) {
-  let uid = req.params.uid;
-  let desc = req.body.desc,
-    dest = req.body.dest, time = req.body.time;
-
-  let quer = "Insert into visits (Description, Destination, Timestamp, UID) VALUES(?,?,?,?)";
-
-  db.query(quer,[desc, dest, time, uid], function (err, result) {
-    if (err) throw err;
-    res.send(result);
-  });
-
-});
-
-//getting all requests data shughal
-app.get('/requests', function (req, res) {
-  db.query("Select * from requests", function (err, result) {
-
-    if (err) throw err
-    res.send(result);
-  });
-});
-
-//getting requests for a particular visit posted by a user
-app.get('/users/:id/visit/:vid/requests', function (req, res) {
-  let vid = req.params.vid;
-  db.query("Select * from requests where VID = ?", [vid], function (err, result) {
-
-    if (err) throw err
-    res.send(result);
-  });
-});
-
-//updating status of request ie accepting and declining or completed ie using put
-app.put('/users/:id/visit/:vid/request/:rid', function (req, res) {
-  let rid = req.params.rid;
-  let status = req.body.status;
-
-  let quer = "Update requests set Status = ? where ID = ?";
-
-  db.query(quer, [status, rid], function (err, result) {
-    if (err) throw err;
-    res.send("Request status set to " + status);
-  });
-});
-
-
-//Requester part
-
-//posting request on a particular visit
-app.post('/visits/:vid/requests', function (req, res) {
-  let vid = req.params.vid;
-  let desc = req.body.desc;
-  let uid = req.body.uid;
-
-  let quer = "Insert into requests (Description, UID, VID) VALUES( ?,?,?)";
-  db.query(quer,[desc, uid, vid], function (err, result) {
-    if (err) throw err;
-    else res.send("Request created");
-  });
-
-});
-
-//getting all requests for that user
-app.get('/users/:id/requests', function (req, res) {
-  let uid = req.params.id;
-  console.log(uid);
-  db.query("Select * from requests where UID = ?",
-
-    function (err,[uid], result) {
-      if (err) throw err
-      res.send(result);
-    });
-});
-
-//Requester completing/declining requests that were unavailable
-app.put('/users/:id/requests/:rid', function (req, res) {
-  let rid = req.params.rid;
-  let status = req.body.status;
-  db.query("Update requests set Status = ? where ID = ?",[status, rid],
-    function (err, result) {
+  var sql = "select * from visits where status<>'Completed' ;";
+  db.query(sql, function (err, result) {
       if (err) throw err;
-      res.send("Request status changed from Not available");
+      res.status(200).send(result);
+  })
+  //res.end();
+});
+
+app.get('/logout', function (req, res) {
+    req.session.destroy((err) => {
+        if (err) throw err;
+        res.status(200).send({ "status": true });
     });
-
 });
 
-//Completing a visit and earning points
-app.put('/users/:id/visit/:vid', function (req, res) {
-
-  let uid = req.params.id;
-  let vid = req.params.vid;
-  let status = req.body.status;
-
-  //finding if any request is marked 'not available'
-  let quer = "select count(Status) as coun from requests where (Status = 'Not Available' OR 'Accepted' OR 'Requested') and VID = ?";
-  //update visits
-  let quer1 = "update visits set Status = ? where ID = ?";
-  //calculating the total completed 
-  let quer2 = "select count(Status) as coun1 from requests where Status = 'Completed' and VID = ?";
-
-  db.query(quer,[vid], function (err, result) {
-
-    count = result[0]["coun"];
-    if (err) throw err;
-      if (count > 0) {
-        res.send("Visit cannot be completed as  " + count +
-         " request not marked completed or rejected");
-      } else {
-        // req complete
-        // Updating status of visit
-        db.query(quer1,[status, vid], function (err, result1) {
-          if (err) throw err;
-          res.send("Visit marked " + status);
-        });
-
-        db.query(quer2,[vid], function (err, result2) {
-
-          //get points 
-          let quer3 = "Select Points from users where uid = ?";
-          let initPoints = 0;
-          db.query(quer3, [uid], function(err, result){
-            initPoints = result['Points'];
-          });
-
-          countComp = result2[0]["coun1"];
-          let points = initPoints;
-
-          if (countComp == 0) {
-            points = initPoints + 0;
-          }
-          else if(countComp > 0) {
-            reqPoint = countComp * 5;
-            points = 5 + reqPoint;
-          }
-          console.log(points);
-
-          //points
-          let quer4 = "update users set points = ? where ID = ?";
-
-          //Updating points of user
-          db.query(quer4,[points, uid], function (err, result) {
-            if (err) throw err;
-            console.log("Updated points");
-          });
-
-        });
-      }
-  });
+app.get('/users', function (req, res) {
+    var sql = "select ID, Name, Email, Points from users;";
+    db.query(sql, function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    })
+    //res.end();
 });
 
+app.get('/users/:uid', function (req, res) {
+    var uid = req.params.uid;
+    var sql = "select * from users where ID = ?;";
+    db.query(sql, [uid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    });
+});
+
+
+app.get('/visits/:vid', function (req, res) {
+    var vid = req.params.vid;
+    var sql = "select * from visits WHERE ID = ?;";
+    db.query(sql, [vid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send({result:"hello"});
+    })
+    //res.end();
+});
+
+app.get('/users/:uid/visits', function (req, res) {
+    var uid = req.params.uid;
+    var sql = "select * from visits where UID = ?;";
+    db.query(sql, [uid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    });
+});
+
+app.get('/users/:uid/visits/:vid', function (req, res) {
+    var uid = req.params.uid;
+    var vid = req.params.vid
+    var sql = "select * from visits where UID = ? and ID = ?;";
+    db.query(sql, [uid, vid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    });
+});
+
+app.get('/users/:uid/visits/:vid/requests', function (req, res) {
+    var vid = req.params.vid;
+    var sql = "select * from requests where VID = ?;";
+    db.query(sql, [vid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    });
+});
+
+
+// app.get('/requests', function (req, res) {
+//     var sql = "select * from requests;";
+//     db.query(sql, function(err, result, fields){
+//         if (err) throw err;
+//         if (result.length > 0) res.send(result);
+//         else res.send("No request found!");
+//     })
+//     //res.end();
+// });
+
+app.get('/users/:uid/requests', function (req, res) {
+    var uid = req.params.uid;
+    var sql = "select * from requests where UID = ?;";
+    db.query(sql, [uid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    });
+});
+
+app.get('/users/:uid/requests/:rid', function (req, res) {
+    var uid = req.params.uid;
+    var rid = req.params.rid;
+    var sql = "select * from requests where UID = ? and ID = ?;";
+    db.query(sql, [uid, rid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    });
+});
+
+// app.post('/users', function (req, res) {
+//     var name = req.body.name;
+//     var sql = "INSERT into users (Name) values (?);";
+//     db.query(sql, [name], function (err, result) {
+//         if (err) throw err;
+//         res.send("User added Successfully!");
+//     });
+// });
+
+app.post('/users/:uid/visit', function (req, res) {
+    var uid = req.params.uid;
+    var description = req.body.description;
+    var destination = req.body.destination;
+    var timestamp = req.body.timestamp;
+    var sql = "INSERT into visits (Description, Destination, Timestamp, UID) values (?, ?, ?, ?);";
+    db.query(sql, [description, destination, timestamp, uid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send({ "Message": "Your visit is registered!" });
+    });
+});
+
+app.post('/visits/:vid/request', function (req, res) {
+    var vid = req.params.vid;
+    var description = req.body.description;
+    var uid = req.body.uid;
+    var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
+    db.query(sql, [description, vid, uid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send({ "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
+    });
+});
+
+app.put('/users/:uid/visits/:vid/requests/:rid', function (req, res) {
+    var rid = req.params.rid;
+    var status = req.body.status;
+    var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
+    db.query(sql, [status, rid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send({ "Message": "Request Status Updated!" });
+    });
+});
+
+app.put('/users/:uid/visits/:vid', function (req, res) {
+    var uid = req.params.uid;
+    var vid = req.params.vid;
+    var status = req.body.status;
+    var sql = "SELECT count(*) as notavailable from requests WHERE (status = 'Not Available' OR status = 'Accepted' OR status = 'Requested') and VID = ?;";
+    db.query(sql, [vid], function (err, result) {
+        if (err) throw err;
+        var na_requests = result[0]["notavailable"];
+        if (na_requests > 0) {
+            res.status(200).send({ "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
+        }
+        else {
+            var sql = "SELECT points from users WHERE ID = ?;";
+            db.query(sql, [uid], function (err, result) {
+                if (err) throw err;
+                var previous_points = result[0]["points"];
+                var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = ?;";
+                db.query(sql, [vid], function (err, result) {
+                    if (err) throw err;
+                    var completed_requests = result[0]["completed"];
+                    if (completed_requests > 0) {
+                        var points = (completed_requests * 5) + 5;
+                        points = previous_points + points;
+                        var sql = "UPDATE users SET points = ? WHERE ID = ?;";
+                        db.query(sql, [points, uid], function (err, result) {
+                            if (err) throw err;
+                            var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
+                            db.query(sql, [status, vid], function (err, result) {
+                                if (err) throw err;
+                                res.status(200).send({ "Message": "Visit Status Updated!" });
+                            });
+                        });
+                    }
+                });
+            });
+        }
+    });
+});
+
+app.put('/users/:uid/requests/:rid', function (req, res) {
+    var uid = req.params.uid;
+    var rid = req.params.rid;
+    var status = req.body.status;
+    var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
+    db.query(sql, [status, rid], function (err, result) {
+        if (err) throw err;
+        res.status(200).send({ "Message": "Request Status Updated!" });
+    });
+});
 
 app.listen(3000);

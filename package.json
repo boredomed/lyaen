@@ -9,13 +9,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.19.0",
+    "connect-redis": "^3.4.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.16.2",
     "express-useragent": "^1.0.12",
     "mongodb": "^3.2.7",
     "mysql": "^2.17.1",
-    "nodemon": "^1.19.1"
+    "node-pre-gyp": "^0.13.0",
+    "nodemon": "^1.19.1",
+    "nopt": "^4.0.1",
+    "redis": "^2.8.0"
   }
 }
