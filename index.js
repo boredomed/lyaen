@@ -6,6 +6,8 @@ var redis = require('redis');
 var redisStore = require('connect-redis')(session);
 var client = redis.createClient();
 var app = express();
+var cors = require('cors');
+app.use(cors());
 
 var db = mysql.createConnection({
     host: "localhost",
@@ -45,6 +47,8 @@ app.use(session({
     }),
 }));
 
+app.use('/', express.static('views'));
+
 app.post('/signin', function (req, res) {
     let email = req.body.email;
     let pwd = req.body.pwd;
@@ -77,7 +81,7 @@ app.post('/signin', function (req, res) {
 app.post('/signup', function (req, res) {
     var name = req.body.name;
     var email = req.body.email;
-    var pwd = req.body.pwd;
+    var pwd = req.body.pwd1;
     var cpwd = req.body.cpwd;
     if (validateName(name)) {
         if (validateEmail(email)) {
