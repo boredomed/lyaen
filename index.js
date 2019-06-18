@@ -3,7 +3,10 @@ var app = express();
 var session = require('express-session');
 var router = express.Router();
 var mysql = require('mysql');
+var cors = require('cors');
 
+app.use(cors());
+//const bcrypt = require('bcrypt');
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -21,6 +24,42 @@ const db = mysql.createConnection({
 db.connect(function (err) {
   if (err) throw err;
   console.log('Connected to database');
+});
+
+//signup
+app.post('/signup', function(req, res){
+
+  function validateEmail(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+  }
+
+  function validateName(name){
+    var re1 = /^[a-zA-Z ]{2,30}$/;
+    return re1.test(name);
+  }
+  
+  let name = req.body.name;
+  let email = req.body.email;
+  let password = req.body.password;
+
+  console.log("name ----------");
+  console.log(req.body.name);  
+  console.log(req.headers);
+
+    if(validateEmail(email) && validateName(name)){
+      let quer = "Insert into users (Name, Email, Pwd) VALUES(?,?,?)";
+  
+      db.query(quer,[name, email, password], function (err, result) {
+        if (err) throw err;
+        console.log("Inserted");
+        res.send(result);
+      });  
+    }
+    else{
+      console.log("Wrong format");
+      res.send({name: "ahmad"});
+    }
 });
 
 //creating user

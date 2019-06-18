@@ -1,0 +1,83 @@
+</html>
+
+<head>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+  <script>
+
+    function login() {
+
+    }
+
+    function signup() {
+      var x = document.getElementById("name").value;
+      document.getElementById("demo").innerHTML = x;
+      console.log("decfdyujbgj");
+      var headersOpt = {
+        "content-type": "application/json",
+      };
+      const request = new Request('http://localhost:3000/signup', {'content-type' : 'application/json',  method: 'POST', body: '{"name": "ahmaad", "email":"ahmad@gmail.com", "passsword":"love"}' });
+      
+
+      fetch(request)
+        .then(response => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            throw new Error('Something went wrong on api server!');
+          }
+        })
+        .then(response => {
+          console.debug(response);
+          // ...
+        }).catch(error => {
+          console.error(error);
+        });
+    }
+  </script>
+
+</head>
+
+
+<!------ Include the above in your HEAD tag ---------->
+
+<body>
+
+  <input type="text" class="form-control" id="name" name="username" value="" placeholder="username or email">
+  <!-- Login Button -->
+
+  <div class="col-sm-12 controls">
+    <a id="btn-login" href="#" class="btn btn-success" onclick="signup()">Login </a>
+    <a id="btn-fblogin" href="#" class="btn btn-primary">Login with Facebook</a>
+
+  </div>
+  <p id="demo"></p>
+
+  <div class="form-group">
+    <div class="col-md-12 control">
+      <div style="border-top: 1px solid#888; padding-top:15px; font-size:85%">
+        Don't have an account!
+        <a href="#" onClick="$('#loginbox').hide(); $('#signupbox').show()">
+          Sign Up Here
+        </a>
+      </div>
+    </div>
+  </div>
+  </form>
+  </div>
+  </div>
+  </div>
+
+</body>
+
+</html>
