@@ -1,0 +1,142 @@
+</html>
+
+<head meta charset="utf-8">
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <!-- jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+  <!-- Popper JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+  <!-- Latest compiled JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</head>
+
+
+<!------ Include the above in your HEAD tag ---------->
+
+<body>
+  <div class="container">
+    <!--CREATE VISIT-->
+    <div id="visitbox" style="margin-top:50px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+      <div class="panel panel-info">
+        <div class="panel-heading">
+          <div class="panel-title" style="font-size: 30px; height:80px">Create Visit</div>
+          <div class="panel-body">
+            <form id="visitform" class="form-horizontal" role="form">
+
+              <div id="visitalert" style="display:none" class="alert alert-danger">
+                <p>Error:</p>
+                <span></span>
+              </div>
+
+              <!------------ Signup form data -------------->
+              <div class="form-group">
+                <label for="description" class="col-md-6 control-label">Description</label>
+                <div class="col-md-9">
+                  <input id="description" type="text" class="form-control" name="description" placeholder="Description!"
+                    required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="destination" class="col-md-6 control-label">Destination</label>
+                <div class="col-md-9">
+                  <input id="destination" type="text" class="form-control" name="destination" placeholder="Destination!"
+                    required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="date" class="col-md-6 control-label">Date</label>
+                <div class="col-md-9">
+                  <input id="date" type="date" class="form-control" name="date" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="time" class="col-md-6 control-label">Time</label>
+                <div class="col-md-9">
+                  <input id="time" type="time" class="form-control" name="time" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <!-- Button -->
+                <div class="col-md-offset-3 col-md-9">
+                  <button id="btn-visit" type="button" class="btn btn-info" onclick="visit()" data-toggle="modal" data-target="#modal"><i
+                      class="icon-hand-right"></i> &nbsp Register Visit &nbsp
+                  </button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The Modal -->
+  <div class="modal" id="modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+        
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title">Confirmation!</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          
+          <!-- Modal body -->
+          <div class="modal-body">
+            Visit Registration Successful!
+          </div>
+          
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+
+    <script type="text/javascript">
+      function visit() {
+        var description = document.getElementById("description").value;
+        var destination = document.getElementById("destination").value;
+        var date = document.getElementById('date').value;
+        var time = document.getElementById('time').value;
+        var timestamp = date + " " + time + ":00";
+        console.log(timestamp);
+        var obj = {
+          description: description,
+          destination: destination,
+          timestamp: timestamp
+        }
+
+        const request = new Request('http://localhost:3000/visit', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
+
+        fetch(request)
+          .then(response => {
+            if (response.status === 200) {
+              return response.json();
+            } else {
+              throw new Error('Something went wrong on api server!');
+            }
+          })
+          .then(response => {
+            console.debug(response);
+            // ...
+          }).catch(error => {
+            console.error(error);
+          });
+
+      }
+    </script>
+</body>
+
+</html>
