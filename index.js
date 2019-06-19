@@ -74,7 +74,7 @@ app.post('/signin', function (req, res) {
         });
     }
     else {
-        res.status(200).send({ "status":false, "Message": "Invalid Email!" });
+        res.status(200).send({ "status": false, "Message": "Invalid Email!" });
     }
 });
 
@@ -130,8 +130,8 @@ app.use(function (req, res, next) {
     }
 });
 
-app.get('/session', function(req, res){
-    res.status(200).send({ "status": true, "Message":"Access Granted!"})
+app.get('/session', function (req, res) {
+    res.status(200).send({ "status": true, "Message": "Access Granted!" })
 });
 
 app.get('/logout', function (req, res) {
@@ -230,10 +230,11 @@ app.post('/visit', function (req, res) {
     var description = req.body.description;
     var destination = req.body.destination;
     var timestamp = req.body.timestamp;
-    var sql = "INSERT into visits (Description, Destination, Timestamp, UID) values (?, ?, ?, ?);";
-    db.query(sql, [description, destination, timestamp, uid], function (err, result) {
+    var maxrequests = req.body.maxrequests
+    var sql = "INSERT into visits (Description, Destination, Timestamp, maxRequests, UID) values (?, ?, ?, ?, ?);";
+    db.query(sql, [description, destination, timestamp, maxrequests, uid], function (err, result) {
         if (err) throw err;
-        res.status(200).send({ "status": true,  "Message": "Your visit is registered!" });
+        res.status(200).send({ "status": true, "Message": "Your visit is registered!" });
     });
 });
 app.post('/request', function (req, res) {

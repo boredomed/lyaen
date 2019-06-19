@@ -70,6 +70,15 @@
                     required>
                 </div>
               </div>
+
+              <div class="form-group">
+                <label for="maxrequests" class="col-md-6 control-label">Max Requests</label>
+                <div class="col-md-9">
+                  <input id="maxrequests" type="text" class="form-control" name="maxrequests" placeholder="Enter max number of requests!"
+                    required>
+                </div>
+              </div>
+
               <div class="form-group">
                 <label for="date" class="col-md-6 control-label">Date</label>
                 <div class="col-md-9">
@@ -132,11 +141,12 @@
         var date = document.getElementById('date').value;
         var time = document.getElementById('time').value;
         var timestamp = date + " " + time + ":00";
-        console.log(timestamp);
+        var maxrequests = document.getElementById('maxrequests').value;
         var obj = {
           description: description,
           destination: destination,
-          timestamp: timestamp
+          timestamp: timestamp,
+          maxrequests: maxrequests
         }
 
         const request = new Request('http://localhost:3000/visit', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
