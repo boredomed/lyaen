@@ -13,6 +13,9 @@
         if (response.status === 200) {
           window.location.replace("/home.html");
         }
+        else if (response.status === 401){
+          console.log("Authentication Failed!");
+        }
         else {
           throw new Error('Something went wrong on api server!');
         }
