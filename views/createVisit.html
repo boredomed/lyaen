@@ -12,7 +12,28 @@
 
   <!-- Latest compiled JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript">
+    const request = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
 
+    fetch(request)
+      .then(response => {
+        if (response.status === 200) {
+          //return response.json();
+        }
+        else if (response.status === 401) {
+          window.location.replace("/");
+        }
+        else {
+          throw new Error('Something went wrong on api server!');
+        }
+      })
+      .then(response => {
+        console.debug(response);
+        // ...
+      }).catch(error => {
+        console.error(error);
+      });
+  </script>
 </head>
 
 
@@ -66,8 +87,8 @@
               <div class="form-group">
                 <!-- Button -->
                 <div class="col-md-offset-3 col-md-9">
-                  <button id="btn-visit" type="button" class="btn btn-info" onclick="visit()" data-toggle="modal" data-target="#modal"><i
-                      class="icon-hand-right"></i> &nbsp Register Visit &nbsp
+                  <button id="btn-visit" type="button" class="btn btn-info" onclick="visit()" data-toggle="modal"
+                    data-target="#modal"><i class="icon-hand-right"></i> &nbsp Register Visit &nbsp
                   </button>
                 </div>
               </div>
@@ -79,26 +100,26 @@
     </div>
 
     <!-- The Modal -->
-  <div class="modal" id="modal">
+    <div class="modal" id="modal">
       <div class="modal-dialog">
         <div class="modal-content">
-        
+
           <!-- Modal Header -->
           <div class="modal-header">
             <h4 class="modal-title">Confirmation!</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
-          
+
           <!-- Modal body -->
           <div class="modal-body">
             Visit Registration Successful!
           </div>
-          
+
           <!-- Modal footer -->
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
           </div>
-          
+
         </div>
       </div>
     </div>

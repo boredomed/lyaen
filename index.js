@@ -128,7 +128,11 @@ app.use(function (req, res, next) {
     else {
         res.status(401).send({ "Message": "Authentication Required!" });
     }
-})
+});
+
+app.get('/session', function(req, res){
+    res.status(200).send({"Message":"Access Granted!"})
+});
 
 app.get('/logout', function (req, res) {
     req.session.destroy((err) => {
@@ -241,8 +245,8 @@ app.get('/users/:uid/requests/:rid', function (req, res) {
 //     });
 // });
 
-app.post('/users/:uid/visit', function (req, res) {
-    var uid = req.params.uid;
+app.post('/visit', function (req, res) {
+    var uid = req.session.user;
     var description = req.body.description;
     var destination = req.body.destination;
     var timestamp = req.body.timestamp;
@@ -253,10 +257,10 @@ app.post('/users/:uid/visit', function (req, res) {
     });
 });
 
-app.post('/visits/:vid/request', function (req, res) {
-    var vid = req.params.vid;
+app.post('/request', function (req, res) {
+    var vid = req.body.vid;
     var description = req.body.description;
-    var uid = req.body.uid;
+    var uid = req.session.user;
     var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
     db.query(sql, [description, vid, uid], function (err, result) {
         if (err) throw err;
