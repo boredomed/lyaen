@@ -178,8 +178,8 @@ app.get('/visits/:vid', function (req, res) {
     //res.end();
 });
 
-app.get('/visits', function (req, res) {
-    var uid = req.session.uid;
+app.get('/myvisits', function (req, res) {
+    var uid = req.session.user;
     var sql = "select * from visits where UID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
