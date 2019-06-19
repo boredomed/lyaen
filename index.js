@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs@123",
-    database: "nodeapp"
+    password: "seecs123",
+    database: "lyaen"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-//client.auth("seecs123");
+client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -69,12 +69,12 @@ app.post('/signin', function (req, res) {
                 });
             }
             else {
-                res.status(200).send({ "status": true, "Message": "Access Denied!" })
+                res.status(200).send({ "status": false, "Message": "Access Denied!" })
             }
         });
     }
     else {
-        res.status(400).send({ "Message": "Invalid Email!" });
+        res.status(200).send({ "status":false, "Message": "Invalid Email!" });
     }
 });
 
@@ -97,7 +97,7 @@ app.post('/signup', function (req, res) {
                             var sql = "INSERT into users (Name, Email, Pwd) values (?, ?, ?);";
                             db.query(sql, [name, email, hash], function (err, result) {
                                 if (err) throw err;
-                                res.status(200).send({ "Message": "Sign Up Successful!" });
+                                res.status(200).send({ "status": true, "Message": "Sign Up Successful!" });
                             });
                         });
                     }
@@ -109,11 +109,11 @@ app.post('/signup', function (req, res) {
 
         }
         else {
-            res.status(400).send({ "Message": "Invalid Email!" });
+            res.status(400).send({ "status": false, "Message": "Invalid Email!" });
         }
     }
     else {
-        res.status(400).send({ "Message": "Name can only contains Spaces or Alphabets!" });
+        res.status(400).send({ "status": false, "Message": "Name can only contains Spaces or Alphabets!" });
     }
 });
 
@@ -126,12 +126,12 @@ app.use(function (req, res, next) {
         next();
     }
     else {
-        res.status(401).send({ "Message": "Authentication Required!" });
+        res.status(401).send({ "status": false, "Message": "Authentication Required!" });
     }
 });
 
 app.get('/session', function(req, res){
-    res.status(200).send({"Message":"Access Granted!"})
+    res.status(200).send({ "status": true, "Message":"Access Granted!"})
 });
 
 app.get('/logout', function (req, res) {
@@ -233,7 +233,7 @@ app.post('/visit', function (req, res) {
     var sql = "INSERT into visits (Description, Destination, Timestamp, UID) values (?, ?, ?, ?);";
     db.query(sql, [description, destination, timestamp, uid], function (err, result) {
         if (err) throw err;
-        res.status(200).send({ "Message": "Your visit is registered!" });
+        res.status(200).send({ "status": true,  "Message": "Your visit is registered!" });
     });
 });
 app.post('/request', function (req, res) {
@@ -243,7 +243,7 @@ app.post('/request', function (req, res) {
     var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
     db.query(sql, [description, uid, vid], function (err, result) {
         if (err) throw err;
-        res.status(200).send({ "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
+        res.status(200).send({ "status": true, "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
     });
 });
 
@@ -253,7 +253,7 @@ app.put('/users/:uid/visits/:vid/requests/:rid', function (req, res) {
     var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
     db.query(sql, [status, rid], function (err, result) {
         if (err) throw err;
-        res.status(200).send({ "Message": "Request Status Updated!" });
+        res.status(200).send({ "status": true, "Message": "Request Status Updated!" });
     });
 });
 
@@ -266,7 +266,7 @@ app.put('/users/:uid/visits/:vid', function (req, res) {
         if (err) throw err;
         var na_requests = result[0]["notavailable"];
         if (na_requests > 0) {
-            res.status(200).send({ "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
+            res.status(200).send({ "status": true, "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
         }
         else {
             var sql = "SELECT points from users WHERE ID = ?;";
@@ -286,7 +286,7 @@ app.put('/users/:uid/visits/:vid', function (req, res) {
                             var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
                             db.query(sql, [status, vid], function (err, result) {
                                 if (err) throw err;
-                                res.status(200).send({ "Message": "Visit Status Updated!" });
+                                res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
                             });
                         });
                     }
@@ -303,7 +303,7 @@ app.put('/users/:uid/requests/:rid', function (req, res) {
     var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
     db.query(sql, [status, rid], function (err, result) {
         if (err) throw err;
-        res.status(200).send({ "Message": "Request Status Updated!" });
+        res.status(200).send({ "status": true, "Message": "Request Status Updated!" });
     });
 });
 
