@@ -242,7 +242,7 @@ app.post('/request', function (req, res) {
     var description = req.body.description;
     var uid = req.session.user;
     var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
-    db.query(sql, [description, vid, uid], function (err, result) {
+    db.query(sql, [description, uid, vid], function (err, result) {
         if (err) throw err;
         res.status(200).send({ "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
     });
