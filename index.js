@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs123",
-    database: "lyaen"
+    password: "seecs@123",
+    database: "nodeapp"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-client.auth("seecs123");
+//client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -180,8 +180,8 @@ app.get('/visits/:vid', function (req, res) {
     //res.end();
 });
 
-app.get('/users/:uid/visits', function (req, res) {
-    var uid = req.params.uid;
+app.get('/visits', function (req, res) {
+    var uid = req.session.uid;
     var sql = "select * from visits where UID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
@@ -189,6 +189,7 @@ app.get('/users/:uid/visits', function (req, res) {
     });
 });
 
+//Getting visits of a particular user
 app.get('/users/:uid/visits/:vid', function (req, res) {
     var uid = req.params.uid;
     var vid = req.params.vid
@@ -271,6 +272,7 @@ app.put('/users/:uid/visits/:vid/requests/:rid', function (req, res) {
     });
 });
 
+//Completeing visit by a particular user
 app.put('/users/:uid/visits/:vid', function (req, res) {
     var uid = req.params.uid;
     var vid = req.params.vid;

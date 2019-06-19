@@ -43,6 +43,7 @@
   <script>
 
     //Getting all visits data and displaying in table 
+    
     const request = new Request('http://localhost:3000/visits', { method: 'GET', mode: 'cors' });
     fetch(request)
       .then(response => {
@@ -95,99 +96,13 @@
         console.error(error);
       });
 
-    var vid = 0;
-    //opening model onclick table row
-    $(document).ready(function () {
-      $(document).on("click", "#t1 tbody tr", function () {
-        var id = $(this).attr('id');
-        vid = id;
-        //$(".resData").hide();
-        $(".resData").hide();
-        $(".reqData").show();
-        $('#myModal').modal('show');
-      });
-    });
-
-    //placing request
-    $(document).ready(function () {
-      $(document).on("click", "#buton", function () {
-
-        var description = document.getElementById("desc").value;
-        var obj = {
-          description: description,
-          vid: vid
-        }
-        $(".reqData").hide();
-        $(".resData").show();
-        const request = new Request('http://localhost:3000/request', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
-
-        fetch(request)
-          .then(response => {
-            if (response.status === 200) {
-              return response.json();
-            } else {
-              throw new Error('Something went wrong on api server!');
-            }
-          })
-          .then(data => {
-            if (data.status == true)
-              $(".resheading").text("Request Generated");
-            else $(".resheading").text("Error generating request");
-
-          })
-          .then(response => {
-            console.debug(response);
-            // ...
-          }).catch(error => {
-            console.error(error);
-          });
-      });
-
-      $(document).on("click" , "#buton1", function(){
-        location.reload();
-      })
-    });
-
 
   </script>
 
-  <h1 class="card-title" style="text-align: center; margin-top: 10px; ">All visits</h1>
+  <h1 class="card-title" style="text-align: center; margin-top: 10px; ">My visits</h1>
 
   <table id="t1" class="table table-hover" style="background-color:azure">
   </table>
-
-  <div id="myModal" class="modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" class="card-title"><b>Place Request</b></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div style="padding-top:1px" class="panel-body">
-
-            <div class="reqdata" class="form-group">
-              <label for="name" class="col-md-3 control-label">Description</label>
-              <div class="col-md-9">
-                <textarea id="desc" class="form-control" name="desc" placeholder="Description"></textarea>
-              </div>
-            </div>
-
-            <div class="resdata" class="form-group">
-              <h5 class="resheading" class="col-md-9 control-label"></h5>
-            </div>
-
-          </div>
-          <div class="modal-footer">
-            <button id="buton" type="button" class="btn btn-info">Save changes</button>
-            <button id = "buton1" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
 
 
 </body>
