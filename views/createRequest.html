@@ -74,7 +74,6 @@
     //opening model onclick table row
     $(document).ready(function () {
       $(document).on("click", "#t1 tbody tr", function () {
-        //some think
         var id = $(this).attr('id');
         vid = id;
         //$(".resData").hide();
@@ -106,8 +105,9 @@
           }
         })
         .then(data => {
-
-
+          if(data.status == true)
+            $(".resheading").text("Request Generated");
+          else $(".resheading").text("Error generating request");
 
         })
         .then(response => {
@@ -147,7 +147,7 @@
             </div>
 
             <div class="resdata" class="form-group">
-              <h5 class="col-md-6 control-label">Request generated</h5>
+              <h5 class = "resheading" class="col-md-9 control-label"></h5>
             </div>
 
           </div>
