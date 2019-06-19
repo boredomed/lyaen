@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs@123",
-    database: "nodeapp"
+    password: "seecs123",
+    database: "lyaen"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-//client.auth("seecs123");
+client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -69,12 +69,12 @@ app.post('/signin', function (req, res) {
                 });
             }
             else {
-                res.status(200).send({ "status": true, "Message": "Access Denied!" })
+                res.status(200).send({ "status": false, "Message": "Access Denied!" })
             }
         });
     }
     else {
-        res.status(400).send({ "Message": "Invalid Email!" });
+        res.status(200).send({ "status":false, "Message": "Invalid Email!" });
     }
 });
 
