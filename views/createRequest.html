@@ -5,39 +5,121 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script>
-  const request = new Request('http://localhost:3000/visits', {method: 'GET', mode : 'cors'});
-
-   fetch(request)
-    .then(response => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error('Something went wrong on api server!');
-      }
-    })
-    .then(data => {
-      var desc = data[0].Description;
-      document.getElementById("visit").innerHTML = desc;
-
-    })
-    .then(response => {
-      console.debug(response);
-      // ...
-    }).catch(error => {
-      console.error(error);
-    });
-
-  
-  </script>
-
+  <script src="~/scripts/jquery-1.10.2.js"></script>
+<!-- #region datatables files -->
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
+<script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 </head>
 
 
 <!------ Create Request Page ---------->
+
 <body>
-<h1>All visits</h1>
-<p id = "visit"></p>
+  <script>
+
+    const request = new Request('http://localhost:3000/visits', { method: 'GET', mode: 'cors' });
+    fetch(request)
+      .then(response => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          throw new Error('Something went wrong on api server!');
+        }
+      })
+      .then(data => {
+        $(function () {
+
+          // EXTRACT VALUE FOR HTML HEADER. 
+          var response = data;
+          var col = [];
+          for (var i = 0; i < response.length - 1; i++) {
+            for (var key in response[i]) {
+              if (col.indexOf(key) === -1) {
+                col.push(key);
+              }
+            }
+          }
+          //Placing header in the table head
+          var c = [];
+          c.push("<thead><tr><strong>");
+          for (var i = 0; i < col.length - 1; i++) {
+            c.push("<th>" + col[i] + "</th>");
+          }
+          c.push("</strong></tr></thead><tbody>");
+
+          //placing data in table body
+          $.each(response, function (i, item) {
+            c.push("<tr id = "+item.ID+"><td>" + item.ID + "</td>");
+              $('tr').attr('id', item.ID);
+            c.push("<td>" + item.Description + "</td>");
+            c.push("<td>" + item.Destination + "</td>");
+            c.push("<td>" + item.Timestamp + "</td>");
+            c.push("<td>" + item.Status + "</td></tr>");
+          });
+          c.push("</tbody>");
+          $('#t1').html(c.join(""));
+        });
+      })
+      .then(response => {
+        console.debug(response);
+        // ...
+      }).catch(error => {
+        console.error(error);
+      });
+
+    //opening model onclick table row
+    $(document).ready(function () {
+      $(document).on("click", "#t1 tbody tr", function () {
+        //some think
+        var cid = $(this).attr('id');
+        //var table = $('#t1').DataTable();
+        //var id = table.row( this ).id();
+        $('#myModal').modal('show');
+      });
+    });
+  </script>
+
+  <h1 class="card-title" style="text-align: center; margin-top: 10px; ">All visits</h1>
+
+  <table id="t1" class="table table-hover" style = "background-color:azure">
+  </table>
+
+  <div id="myModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" class="card-title">Place Request</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div style="padding-top:1px" class="panel-body">
+            <div class="form-group">
+              <label for="email1" class="col-md-3 control-label">Name</label>
+              <div class="col-md-9">
+                <input id="email1" type="text" class="form-control" name="email" placeholder="Email Address">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="name" class="col-md-3 control-label">Description</label>
+              <div class="col-md-9">
+                <textarea id="name"  class="form-control" name="name" placeholder="Name"></textarea>
+              </div>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
 </body>
 
 </html>

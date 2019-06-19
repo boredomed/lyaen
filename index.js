@@ -206,17 +206,6 @@ app.get('/users/:uid/visits/:vid/requests', function (req, res) {
     });
 });
 
-
-// app.get('/requests', function (req, res) {
-//     var sql = "select * from requests;";
-//     db.query(sql, function(err, result, fields){
-//         if (err) throw err;
-//         if (result.length > 0) res.send(result);
-//         else res.send("No request found!");
-//     })
-//     //res.end();
-// });
-
 app.get('/users/:uid/requests', function (req, res) {
     var uid = req.params.uid;
     var sql = "select * from requests where UID = ?;";
@@ -236,17 +225,8 @@ app.get('/users/:uid/requests/:rid', function (req, res) {
     });
 });
 
-// app.post('/users', function (req, res) {
-//     var name = req.body.name;
-//     var sql = "INSERT into users (Name) values (?);";
-//     db.query(sql, [name], function (err, result) {
-//         if (err) throw err;
-//         res.send("User added Successfully!");
-//     });
-// });
-
 app.post('/visit', function (req, res) {
-    var uid = req.session.user;
+    var uid = req.params.uid;
     var description = req.body.description;
     var destination = req.body.destination;
     var timestamp = req.body.timestamp;
