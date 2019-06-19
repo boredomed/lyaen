@@ -4,20 +4,26 @@
   <title>Add Request</title>
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="~/scripts/jquery-1.10.2.js"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+  <!-- Bootstrap core CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/css/mdb.min.css" rel="stylesheet">
+
+
   <!-- #region datatables files -->
   <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
-  <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+   <!-- JQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
     const request1 = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
 
     fetch(request1)
       .then(response => {
         if (response.status === 200) {
-          //return response.json();
+          return response.json()
         }
         else if (response.status === 401) {
           window.location.replace("/");
@@ -26,12 +32,39 @@
           throw new Error('Something went wrong on api server!');
         }
       })
+      .then(data => {
+        $("#name").text(data["name"]);
+      })
       .then(response => {
         console.debug(response);
         // ...
       }).catch(error => {
         console.error(error);
       });
+    function logout() {
+      const request = new Request('http://localhost:3000/logout', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
+
+      fetch(request)
+        .then(response => {
+          if (response.status === 200) {
+            return response.json()
+          }
+          else {
+            throw new Error('Something went wrong on api server!');
+          }
+        })
+        .then(data => {
+          if (data["status"]) {
+            window.location.replace('/')
+          }
+        })
+        .then(response => {
+          console.debug(response);
+          // ...
+        }).catch(error => {
+          console.error(error);
+        });
+    }
   </script>
 
 </head>
@@ -40,156 +73,210 @@
 <!------ Create Request Page ---------->
 
 <body>
-  <script>
 
-    //Getting all visits data and displaying in table 
-    const request = new Request('http://localhost:3000/visits', { method: 'GET', mode: 'cors' });
-    fetch(request)
-      .then(response => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          throw new Error('Something went wrong on api server!');
-        }
-      })
-      .then(data => {
-        $(function () {
+  <section class="col-md-12">
+    <nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color">
+      <a class="navbar-brand" href="#">LYAEN</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-333"
+        aria-controls="navbarSupportedContent-333" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent-333">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/home.html">Home </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/visits.html">Visits</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/requests.html">Requests</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto nav-flex-icons">
+          <li class="nav-item">
+            <a class="nav-link" id="navbarDropdownMenuLink-4">
+              <i class="fas fa-user"></i>
+              <span id="name"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span id="logout">Logout</span>
+            </a>
+      </div>
+      </li>
+      </ul>
+      </div>
+    </nav>
+  </section>
+  <!--/.Navbar -->
+  <div class="container">
+    <h1 class="card-title" style="text-align: center; margin-top: 10px; ">All visits</h1>
 
-          // EXTRACT VALUE FOR HTML HEADER. 
-          var response = data;
-          var col = [];
-          for (var i = 0; i < response.length; i++) {
-            for (var key in response[i]) {
-              if (col.indexOf(key) === -1) {
-                col.push(key);
-              }
-            }
-          }
-          //Placing header in the table head
-          var c = [];
-          c.push("<thead><tr><strong>");
-          for (var i = 0; i < col.length - 1; i++) {
-            if (col[i] == 'maxRequests') col[i] = "Max Requests";
-            c.push("<th>" + col[i] + "</th>");
-          }
-          c.push("</strong></tr></thead><tbody>");
+    <table id="t1" class="table table-hover" style="background-color:azure">
+    </table>
 
-          //placing data in table body
-          $.each(response, function (i, item) {
-            c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
-            $('tr').attr('id', item.ID);
-            c.push("<td>" + item.Description + "</td>");
-            c.push("<td>" + item.Destination + "</td>");
-            c.push("<td>" + item.Timestamp + "</td>");
-            c.push("<td>" + item.maxRequests + "</td>");
-            c.push("<td>" + item.Status + "</td></tr>");
-          });
-          c.push("</tbody>");
-          $('#t1').html(c.join(""));
-        });
-      })
-      .then(response => {
-        console.debug(response);
-        // ...
-      }).catch(error => {
-        console.error(error);
-      });
-
-    var vid = 0;
-    //opening model onclick table row
-    $(document).ready(function () {
-      $(document).on("click", "#t1 tbody tr", function () {
-        var id = $(this).attr('id');
-        vid = id;
-        //$(".resData").hide();
-        $(".resData").hide();
-        $(".reqData").show();
-        $('#myModal').modal('show');
-      });
-    });
-
-    //placing request
-    $(document).ready(function () {
-      $(document).on("click", "#buton", function () {
-
-        var description = $("#desc").val();
-        var obj = {
-          description: description,
-          vid: vid
-        }
-        $(".reqData").hide();
-        $(".resData").show();
-        const request = new Request('http://localhost:3000/request', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
-
-        fetch(request)
-          .then(response => {
-            if (response.status === 200) {
-              return response.json();
-            } else {
-              throw new Error('Something went wrong on api server!');
-            }
-          })
-          .then(data => {
-            if (data.status == true)
-              $(".resheading").text("Request Generated");
-            else $(".resheading").text("Error generating request");
-
-          })
-          .then(response => {
-            console.debug(response);
-            // ...
-          }).catch(error => {
-            console.error(error);
-          });
-      });
-
-      $(document).on("click", "#buton1", function () {
-        location.reload();
-      })
-    });
-
-
-  </script>
-
-  <h1 class="card-title" style="text-align: center; margin-top: 10px; ">All visits</h1>
-
-  <table id="t1" class="table table-hover" style="background-color:azure">
-  </table>
-
-  <div id="myModal" class="modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" class="card-title"><b>Place Request</b></h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div style="padding-top:1px" class="panel-body">
-
-            <div class="reqdata" class="form-group">
-              <label for="name" class="col-md-3 control-label">Description</label>
-              <div class="col-md-9">
-                <textarea id="desc" class="form-control" name="desc" placeholder="Description"></textarea>
-              </div>
-            </div>
-
-            <div class="resdata" class="form-group">
-              <h5 class="resheading" class="col-md-9 control-label"></h5>
-            </div>
-
+    <div id="myModal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" class="card-title"><b>Place Request</b></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-          <div class="modal-footer">
-            <button id="buton" type="button" class="btn btn-info">Save changes</button>
-            <button id="buton1" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <div class="modal-body">
+            <div style="padding-top:1px" class="panel-body">
+
+              <div class="reqdata" class="form-group">
+                <label for="name" class="col-md-3 control-label">Description</label>
+                <div class="col-md-9">
+                  <textarea id="desc" class="form-control" name="desc" placeholder="Description"></textarea>
+                </div>
+              </div>
+
+              <div class="resdata" class="form-group">
+                <h5 class="resheading" class="col-md-9 control-label"></h5>
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button id="buton" style="font-size: 1rem;font-family: inherit" type="button" class="btn btn-info btn-md">Save changes</button>
+              <button id="buton1" style="font-size: 1rem;font-family: inherit" type="button" class="btn btn-secondary btn-md" data-dismiss="modal">Close</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+   
+    <!-- Bootstrap tooltips -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"> </script>
+    <!-- Bootstrap
+        core JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/js/mdb.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script>
+
+      //Getting all visits data and displaying in table 
+      const request = new Request('http://localhost:3000/visits', { method: 'GET', mode: 'cors' });
+      fetch(request)
+        .then(response => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            throw new Error('Something went wrong on api server!');
+          }
+        })
+        .then(data => {
+          $(function () {
+
+            // EXTRACT VALUE FOR HTML HEADER. 
+            var response = data;
+            var col = [];
+            for (var i = 0; i < response.length - 1; i++) {
+              for (var key in response[i]) {
+                if (col.indexOf(key) === -1) {
+                  col.push(key);
+                }
+              }
+            }
+            //Placing header in the table head
+            var c = [];
+            c.push("<thead><tr><strong>");
+            for (var i = 0; i < col.length - 1; i++) {
+              if (col[i] == 'maxRequests') col[i] = "Max Requests";
+              c.push("<th>" + col[i] + "</th>");
+            }
+            c.push("</strong></tr></thead><tbody>");
+
+            //placing data in table body
+            $.each(response, function (i, item) {
+              c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+              $('tr').attr('id', item.ID);
+              c.push("<td>" + item.Description + "</td>");
+              c.push("<td>" + item.Destination + "</td>");
+              c.push("<td>" + item.Timestamp + "</td>");
+              c.push("<td>" + item.maxRequests + "</td>");
+              c.push("<td>" + item.Status + "</td></tr>");
+            });
+            c.push("</tbody>");
+            $('#t1').html(c.join(""));
+          });
+        })
+        .then(response => {
+          console.debug(response);
+          // ...
+        }).catch(error => {
+          console.error(error);
+        });
+
+      var vid = 0;
+      //opening model onclick table row
+      $(document).ready(function () {
+        $(document).on("click", "#t1 tbody tr", function () {
+          var id = $(this).attr('id');
+          vid = id;
+          //$(".resData").hide();
+          $(".resData").hide();
+          $(".reqData").show();
+          $('#myModal').modal('show');
+        });
+      });
+
+      //placing request
+      $(document).ready(function () {
+        $(document).on("click", "#buton", function () {
+
+          var description = document.getElementById("desc").value;
+          var obj = {
+            description: description,
+            vid: vid
+          }
+          $(".reqData").hide();
+          $(".resData").show();
+          const request = new Request('http://localhost:3000/request', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
+
+          fetch(request)
+            .then(response => {
+              if (response.status === 200) {
+                return response.json();
+              } else {
+                throw new Error('Something went wrong on api server!');
+              }
+            })
+            .then(data => {
+              if (data.status == true)
+                $(".resheading").text("Request Generated");
+              else $(".resheading").text("Error generating request");
+
+            })
+            .then(response => {
+              console.debug(response);
+              // ...
+            }).catch(error => {
+              console.error(error);
+            });
+        });
+
+        $(document).on("click", "#buton1", function () {
+          location.reload();
+        })
+      });
 
 
+    </script>
 </body>
 
 </html>

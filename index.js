@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs@123",
-    database: "nodeapp"
+    password: "seecs123",
+    database: "lyaen"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-//client.auth("seecs123");
+client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -133,7 +133,7 @@ app.use(function (req, res, next) {
 });
 
 app.get('/session', function (req, res) {
-    res.status(200).send({ "status": true, "Message": "Access Granted!" })
+    res.status(200).send({ "status": true, "Message": "Access Granted!", "ID": req.session.user, "name": req.session.username })
 });
 
 app.get('/logout', function (req, res) {
@@ -253,12 +253,12 @@ app.post('/request', function (req, res) {
             var max = result[0]["max"];
             max = max - 1;
             var sql = "UPDATE visits SET maxRequests = ? WHERE ID = ?;";
-            db.query(sql, [max, vid], function(err, result){
+            db.query(sql, [max, vid], function (err, result) {
                 if (err) throw err;
                 res.status(200).send({ "status": true, "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
             });
         });
-        
+
     });
 });
 
@@ -273,43 +273,52 @@ app.put('/users/:uid/visits/:vid/requests/:rid', function (req, res) {
 });
 
 //Completeing visit by a particular user
-app.put('/users/:uid/visits/:vid', function (req, res) {
-    var uid = req.params.uid;
-    var vid = req.params.vid;
+app.put('/visit', function (req, res) {
+    var uid = req.session.user;
+    var vid = req.body.vid;
     var status = req.body.status;
-    var sql = "SELECT count(*) as notavailable from requests WHERE (status = 'Not Available' OR status = 'Accepted' OR status = 'Requested') and VID = ?;";
-    db.query(sql, [vid], function (err, result) {
-        if (err) throw err;
-        var na_requests = result[0]["notavailable"];
-        if (na_requests > 0) {
-            res.status(200).send({ "status": true, "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
-        }
-        else {
-            var sql = "SELECT points from users WHERE ID = ?;";
-            db.query(sql, [uid], function (err, result) {
-                if (err) throw err;
-                var previous_points = result[0]["points"];
-                var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = ?;";
-                db.query(sql, [vid], function (err, result) {
+    if (status == "Cancelled") {
+        var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
+        db.query(sql, [status, vid], function (err, result) {
+            if (err) throw err;
+            res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
+        });
+    }
+    else {
+        var sql = "SELECT count(*) as notavailable from requests WHERE (status = 'Not Available' OR status = 'Accepted' OR status = 'Requested') and VID = ?;";
+        db.query(sql, [vid], function (err, result) {
+            if (err) throw err;
+            var na_requests = result[0]["notavailable"];
+            if (na_requests > 0) {
+                res.status(200).send({ "status": true, "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
+            }
+            else {
+                var sql = "SELECT points from users WHERE ID = ?;";
+                db.query(sql, [uid], function (err, result) {
                     if (err) throw err;
-                    var completed_requests = result[0]["completed"];
-                    if (completed_requests > 0) {
-                        var points = (completed_requests * 5) + 5;
-                        points = previous_points + points;
-                        var sql = "UPDATE users SET points = ? WHERE ID = ?;";
-                        db.query(sql, [points, uid], function (err, result) {
-                            if (err) throw err;
-                            var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
-                            db.query(sql, [status, vid], function (err, result) {
+                    var previous_points = result[0]["points"];
+                    var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = ?;";
+                    db.query(sql, [vid], function (err, result) {
+                        if (err) throw err;
+                        var completed_requests = result[0]["completed"];
+                        if (completed_requests > 0) {
+                            var points = (completed_requests * 5) + 5;
+                            points = previous_points + points;
+                            var sql = "UPDATE users SET points = ? WHERE ID = ?;";
+                            db.query(sql, [points, uid], function (err, result) {
                                 if (err) throw err;
-                                res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
+                                var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
+                                db.query(sql, [status, vid], function (err, result) {
+                                    if (err) throw err;
+                                    res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
+                                });
                             });
-                        });
-                    }
+                        }
+                    });
                 });
-            });
-        }
-    });
+            }
+        });
+    }
 });
 
 app.put('/users/:uid/requests/:rid', function (req, res) {
