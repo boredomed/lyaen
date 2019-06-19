@@ -11,6 +11,29 @@
   <!-- #region datatables files -->
   <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
   <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript">
+    const request1 = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
+
+    fetch(request1)
+      .then(response => {
+        if (response.status === 200) {
+          //return response.json();
+        }
+        else if (response.status === 401) {
+          window.location.replace("/");
+        }
+        else {
+          throw new Error('Something went wrong on api server!');
+        }
+      })
+      .then(response => {
+        console.debug(response);
+        // ...
+      }).catch(error => {
+        console.error(error);
+      });
+  </script>
+
 </head>
 
 
@@ -105,7 +128,7 @@
           }
         })
         .then(data => {
-          if(data.status == true)
+          if (data.status == true)
             $(".resheading").text("Request Generated");
           else $(".resheading").text("Error generating request");
 
@@ -147,7 +170,7 @@
             </div>
 
             <div class="resdata" class="form-group">
-              <h5 class = "resheading" class="col-md-9 control-label"></h5>
+              <h5 class="resheading" class="col-md-9 control-label"></h5>
             </div>
 
           </div>
