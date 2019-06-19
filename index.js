@@ -53,14 +53,16 @@ app.post('/signin', function (req, res) {
     let email = req.body.email;
     let pwd = req.body.pwd;
     if (validateEmail(email)) {
-        let sql = "SELECT ID, Pwd as hash from users WHERE Email = ?;";
+        let sql = "SELECT ID, Name, Pwd as hash from users WHERE Email = ?;";
         db.query(sql, [email], function (err, result) {
             if (result.length > 0) {
                 var hash = result[0]["hash"];
                 var uid = result[0]["ID"];
+                var name = result[0]["Name"];
                 bcrypt.compare(pwd, hash, function (err, response) {
                     if (response) {
                         req.session.user = uid;
+                        req.session.username = name
                         res.status(200).send({ "status": true, "Message": "Access Granted!" });
                     }
                     else {
