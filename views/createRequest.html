@@ -77,17 +77,24 @@
         //some think
         var id = $(this).attr('id');
         vid = id;
+        //$(".resData").hide();
+        $(".resData").hide();
+        $(".reqData").show();
         $('#myModal').modal('show');
+
       });
     });
 
     //placing request
     function placeRequest() {
+
       var description = document.getElementById("desc").value;
       var obj = {
-        desc: description,
+        description: description,
         vid: vid
       }
+      $(".reqData").hide();
+      $(".resData").show();
       const request = new Request('http://localhost:3000/request', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
 
       fetch(request)
@@ -97,6 +104,11 @@
           } else {
             throw new Error('Something went wrong on api server!');
           }
+        })
+        .then(data => {
+
+
+
         })
         .then(response => {
           console.debug(response);
@@ -127,16 +139,20 @@
         <div class="modal-body">
           <div style="padding-top:1px" class="panel-body">
 
-            <div class="form-group">
+            <div class="reqdata" class="form-group">
               <label for="name" class="col-md-3 control-label">Description</label>
               <div class="col-md-9">
                 <textarea id="desc" class="form-control" name="desc" placeholder="Description"></textarea>
               </div>
             </div>
 
+            <div class="resdata" class="form-group">
+              <h5 class="col-md-6 control-label">Request generated</h5>
+            </div>
+
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-info" onclick="placeRequest()">Save changes</button>
+            <button id="buton" type="button" class="btn btn-info" onclick="placeRequest()">Save changes</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
