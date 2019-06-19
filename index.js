@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs@123",
-    database: "nodeapp"
+    password: "seecs123",
+    database: "lyaen"
 });
 
 db.connect(function (err) {
@@ -31,9 +31,10 @@ function validateName(name) {
     return regex.test(String(name).toLowerCase());
 }
 
+
 app.use(express.json());
 
-//client.auth("seecs123");
+client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -82,7 +83,6 @@ app.post('/signup', function (req, res) {
     var email = req.body.email;
     var pwd = req.body.pwd1;
     var cpwd = req.body.cpwd;
-    console.log(name);
     if (validateName(name)) {
         if (validateEmail(email)) {
             var sql = "SELECT * from users WHERE Email = ?;";
@@ -130,15 +130,6 @@ app.use(function (req, res, next) {
     }
 })
 
-app.get('/visits', function (req, res) {
-  var sql = "select * from visits where status<>'Completed' ;";
-  db.query(sql, function (err, result) {
-      if (err) throw err;
-      res.status(200).send(result);
-  })
-  //res.end();
-});
-
 app.get('/logout', function (req, res) {
     req.session.destroy((err) => {
         if (err) throw err;
@@ -164,13 +155,21 @@ app.get('/users/:uid', function (req, res) {
     });
 });
 
+app.get('/visits', function (req, res) {
+    var sql = "select * from visits where status<>'Completed' ;";
+    db.query(sql, function (err, result) {
+        if (err) throw err;
+        res.status(200).send(result);
+    })
+    //res.end();
+});
 
 app.get('/visits/:vid', function (req, res) {
     var vid = req.params.vid;
     var sql = "select * from visits WHERE ID = ?;";
     db.query(sql, [vid], function (err, result) {
         if (err) throw err;
-        res.status(200).send({result:"hello"});
+        res.status(200).send(result);
     })
     //res.end();
 });
