@@ -178,8 +178,8 @@ app.get('/visits/:vid', function (req, res) {
     //res.end();
 });
 
-app.get('/users/:uid/visits', function (req, res) {
-    var uid = req.params.uid;
+app.get('/visits', function (req, res) {
+    var uid = req.session.uid;
     var sql = "select * from visits where UID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
@@ -187,6 +187,7 @@ app.get('/users/:uid/visits', function (req, res) {
     });
 });
 
+//Getting visits of a particular user
 app.get('/users/:uid/visits/:vid', function (req, res) {
     var uid = req.params.uid;
     var vid = req.params.vid
@@ -269,6 +270,7 @@ app.put('/users/:uid/visits/:vid/requests/:rid', function (req, res) {
     });
 });
 
+//Completeing visit by a particular user
 app.put('/users/:uid/visits/:vid', function (req, res) {
     var uid = req.params.uid;
     var vid = req.params.vid;
