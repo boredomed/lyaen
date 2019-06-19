@@ -44,7 +44,7 @@
 
     //Getting all visits data and displaying in table 
     
-    const request = new Request('http://localhost:3000/visits', { method: 'GET', mode: 'cors' });
+    const request = new Request('http://localhost:3000/myvisits', { method: 'GET', mode: 'cors' });
     fetch(request)
       .then(response => {
         if (response.status === 200) {
