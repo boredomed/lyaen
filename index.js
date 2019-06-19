@@ -244,7 +244,18 @@ app.post('/request', function (req, res) {
     var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
     db.query(sql, [description, uid, vid], function (err, result) {
         if (err) throw err;
-        res.status(200).send({ "status": true, "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
+        var sql = "SELECT maxRequests as max from visits WHERE ID = ?;";
+        db.query(sql, [vid], function (err, result) {
+            if (err) throw err;
+            var max = result[0]["max"];
+            max = max - 1;
+            var sql = "UPDATE visits SET maxRequests = ? WHERE ID = ?;";
+            db.query(sql, [max, vid], function(err, result){
+                if (err) throw err;
+                res.status(200).send({ "status": true, "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
+            });
+        });
+        
     });
 });
 
