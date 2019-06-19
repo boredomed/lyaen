@@ -58,7 +58,7 @@
           // EXTRACT VALUE FOR HTML HEADER. 
           var response = data;
           var col = [];
-          for (var i = 0; i < response.length - 1; i++) {
+          for (var i = 0; i < response.length; i++) {
             for (var key in response[i]) {
               if (col.indexOf(key) === -1) {
                 col.push(key);
@@ -112,7 +112,7 @@
     $(document).ready(function () {
       $(document).on("click", "#buton", function () {
 
-        var description = document.getElementById("desc").value;
+        var description = $("#desc").val();
         var obj = {
           description: description,
           vid: vid
@@ -143,7 +143,7 @@
           });
       });
 
-      $(document).on("click" , "#buton1", function(){
+      $(document).on("click", "#buton1", function () {
         location.reload();
       })
     });
@@ -182,7 +182,7 @@
           </div>
           <div class="modal-footer">
             <button id="buton" type="button" class="btn btn-info">Save changes</button>
-            <button id = "buton1" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button id="buton1" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@
   <!-- #region datatables files -->
   <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
   <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+
   <script type="text/javascript">
     const request1 = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
 
@@ -40,10 +41,51 @@
 <!------ Create Request Page ---------->
 
 <body>
+  <h1 class="card-title" style="text-align: center; margin-top: 10px; ">My visits</h1>
+  <table id="t1" class="table table-hover" style="background-color:azure"></table>
+
+  <!-- The Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Update status of visit</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Status
+            </button>
+            <div id="dropd2" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item">Cancelled</a>
+              <a class="dropdown-item">Completed</a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button id="buton" type="button" class="btn btn-info">Save changes</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
   <script>
 
     //Getting all visits data and displaying in table 
-    
+
     const request = new Request('http://localhost:3000/myvisits', { method: 'GET', mode: 'cors' });
     fetch(request)
       .then(response => {
@@ -59,7 +101,7 @@
           // EXTRACT VALUE FOR HTML HEADER. 
           var response = data;
           var col = [];
-          for (var i = 0; i < response.length - 1; i++) {
+          for (var i = 0; i < response.length; i++) {
             for (var key in response[i]) {
               if (col.indexOf(key) === -1) {
                 col.push(key);
@@ -96,15 +138,22 @@
         console.error(error);
       });
 
+    $(document).ready(function () {
+      $(document).on("click", "#t1 tbody tr", function () {
+        var id = $(this).attr('id');
+        vid = id;
+        $('#modal').modal('show');
+      });
+
+      $(document).on("click", '#dropd2 a', function () {
+        var stat = ($(this).text());
+      })
+    });
+
+
+
 
   </script>
-
-  <h1 class="card-title" style="text-align: center; margin-top: 10px; ">My visits</h1>
-
-  <table id="t1" class="table table-hover" style="background-color:azure">
-  </table>
-
-
 </body>
 
 </html>
