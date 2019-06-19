@@ -1,14 +1,16 @@
 </html>
 
 <head>
+  <title>Add Request</title>
+
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
   <script src="~/scripts/jquery-1.10.2.js"></script>
-<!-- #region datatables files -->
-<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
-<script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+  <!-- #region datatables files -->
+  <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
+  <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 </head>
 
 
@@ -17,6 +19,7 @@
 <body>
   <script>
 
+    //Getting all visits data and displaying in table 
     const request = new Request('http://localhost:3000/visits', { method: 'GET', mode: 'cors' });
     fetch(request)
       .then(response => {
@@ -49,8 +52,8 @@
 
           //placing data in table body
           $.each(response, function (i, item) {
-            c.push("<tr id = "+item.ID+"><td>" + item.ID + "</td>");
-              $('tr').attr('id', item.ID);
+            c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+            $('tr').attr('id', item.ID);
             c.push("<td>" + item.Description + "</td>");
             c.push("<td>" + item.Destination + "</td>");
             c.push("<td>" + item.Timestamp + "</td>");
@@ -67,51 +70,73 @@
         console.error(error);
       });
 
+    var vid = 0;
     //opening model onclick table row
     $(document).ready(function () {
       $(document).on("click", "#t1 tbody tr", function () {
         //some think
-        var cid = $(this).attr('id');
-        //var table = $('#t1').DataTable();
-        //var id = table.row( this ).id();
+        var id = $(this).attr('id');
+        vid = id;
         $('#myModal').modal('show');
       });
     });
+
+    //placing request
+    function placeRequest() {
+      var description = document.getElementById("desc").value;
+      var obj = {
+        desc: description,
+        vid: vid
+      }
+      const request = new Request('http://localhost:3000/request', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
+
+      fetch(request)
+        .then(response => {
+          if (response.status === 200) {
+            return response.json();
+          } else {
+            throw new Error('Something went wrong on api server!');
+          }
+        })
+        .then(response => {
+          console.debug(response);
+          // ...
+        }).catch(error => {
+          console.error(error);
+        });
+
+    }
+
+
   </script>
 
   <h1 class="card-title" style="text-align: center; margin-top: 10px; ">All visits</h1>
 
-  <table id="t1" class="table table-hover" style = "background-color:azure">
+  <table id="t1" class="table table-hover" style="background-color:azure">
   </table>
 
   <div id="myModal" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" class="card-title">Place Request</h5>
+          <h5 class="modal-title" class="card-title"><b>Place Request</b></h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <div style="padding-top:1px" class="panel-body">
-            <div class="form-group">
-              <label for="email1" class="col-md-3 control-label">Name</label>
-              <div class="col-md-9">
-                <input id="email1" type="text" class="form-control" name="email" placeholder="Email Address">
-              </div>
-            </div>
 
             <div class="form-group">
               <label for="name" class="col-md-3 control-label">Description</label>
               <div class="col-md-9">
-                <textarea id="name"  class="form-control" name="name" placeholder="Name"></textarea>
+                <textarea id="desc" class="form-control" name="desc" placeholder="Description"></textarea>
               </div>
             </div>
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary">Save changes</button>
+            <button type="button" class="btn btn-info" onclick="placeRequest()">Save changes</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>

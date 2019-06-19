@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs123",
-    database: "lyaen"
+    password: "seecs@123",
+    database: "nodeapp"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-client.auth("seecs123");
+//client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -222,7 +222,7 @@ app.get('/users/:uid/requests/:rid', function (req, res) {
 });
 
 app.post('/visit', function (req, res) {
-    var uid = req.params.uid;
+    var uid = req.session.user;
     var description = req.body.description;
     var destination = req.body.destination;
     var timestamp = req.body.timestamp;
@@ -233,10 +233,10 @@ app.post('/visit', function (req, res) {
     });
 });
 
-app.post('/visits/:vid/request', function (req, res) {
-    var vid = req.params.vid;
-    var description = req.body.description;
-    var uid = req.body.uid;
+app.post('/request', function (req, res) {
+    var vid = req.body.vid;
+    var description = req.body.desc;
+    var uid = req.session.user;
     var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
     db.query(sql, [description, vid, uid], function (err, result) {
         if (err) throw err;
