@@ -128,7 +128,11 @@ app.use(function (req, res, next) {
     else {
         res.status(401).send({ "Message": "Authentication Required!" });
     }
-})
+});
+
+app.get('/session', function(req, res){
+    res.status(200).send({"Message":"Access Granted!"})
+});
 
 app.get('/logout', function (req, res) {
     req.session.destroy((err) => {
@@ -232,13 +236,12 @@ app.post('/visit', function (req, res) {
         res.status(200).send({ "Message": "Your visit is registered!" });
     });
 });
-
 app.post('/request', function (req, res) {
     var vid = req.body.vid;
-    var description = req.body.desc;
+    var description = req.body.description;
     var uid = req.session.user;
     var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
-    db.query(sql, [description, vid, uid], function (err, result) {
+    db.query(sql, [description, uid, vid], function (err, result) {
         if (err) throw err;
         res.status(200).send({ "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
     });

@@ -17,6 +17,28 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        const request = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
+
+        fetch(request)
+            .then(response => {
+                if (response.status === 200) {
+                    //return response.json();
+                }
+                else if (response.status === 401) {
+                    window.location.replace("/");
+                }
+                else {
+                    throw new Error('Something went wrong on api server!');
+                }
+            })
+            .then(response => {
+                console.debug(response);
+                // ...
+            }).catch(error => {
+                console.error(error);
+            });
+    </script>
 </head>
 
 <body>
@@ -25,25 +47,25 @@
         <div class="row" style="margin: 30px;">
             <div class="col-md-3"></div>
             <div class="col-md-3 text-center">
-                <a href="/create-visit.html" class="btn btn-info btn-lg btn-block">
+                <a href="/createVisit.html" class="btn btn-info btn-lg btn-block">
                     Create Visit
                 </a>
             </div>
             <div class="col-md-3 text-center">
-                <a href="/create-visit.html" class="btn btn-info btn-lg btn-block">
+                <a href="/visits.html" class="btn btn-info btn-lg btn-block">
                     View Visits
                 </a>
             </div>
         </div>
-        <div class="row"  style="margin: 30px;">
+        <div class="row" style="margin: 30px;">
             <div class="col-md-3"></div>
             <div class="col-md-3 text-center">
-                <a href="/create-visit.html" class="btn btn-info btn-lg btn-block">
+                <a href="/createRequest.html" class="btn btn-info btn-lg btn-block">
                     Create Request
                 </a>
             </div>
             <div class="col-md-3 text-center">
-                <a href="/create-visit.html" class="btn btn-info btn-lg btn-block">
+                <a href="/requests.html" class="btn btn-info btn-lg btn-block">
                     View Requests
                 </a>
             </div>
