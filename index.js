@@ -251,12 +251,18 @@ app.post('/request', function (req, res) {
         db.query(sql, [vid], function (err, result) {
             if (err) throw err;
             var max = result[0]["max"];
-            max = max - 1;
-            var sql = "UPDATE visits SET maxRequests = ? WHERE ID = ?;";
-            db.query(sql, [max, vid], function (err, result) {
-                if (err) throw err;
-                res.status(200).send({ "status": true, "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
-            });
+            if (max == 0) {
+                res.status(200).send({ "status": false, "Message": "Maximum Requests Reached" });
+            }
+            else {
+                max = max - 1;
+                var sql = "UPDATE visits SET maxRequests = ? WHERE ID = ?;";
+                db.query(sql, [max, vid], function (err, result) {
+                    if (err) throw err;
+                    res.status(200).send({ "status": true, "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
+                });
+            }
+
         });
 
     });
