@@ -282,7 +282,7 @@ app.put('/visit', function (req, res) {
     var uid = req.session.user;
     var vid = req.body.vid;
     var comingstatus = req.body.status;
-    var sql = "SELECT status from visits WHERE VID = ?;";
+    var sql = "SELECT status from visits WHERE ID = ?;";
     db.query(sql, [vid], function (err, result) {
         if (err) throw err;
         var status = result[0]["status"];
