@@ -244,27 +244,25 @@ app.post('/request', function (req, res) {
     var vid = req.body.vid;
     var description = req.body.description;
     var uid = req.session.user;
-    var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
-    db.query(sql, [description, uid, vid], function (err, result) {
+    var sql = "SELECT maxRequests as max from visits WHERE ID = ?;";
+    db.query(sql, [vid], function (err, result) {
         if (err) throw err;
-        var sql = "SELECT maxRequests as max from visits WHERE ID = ?;";
-        db.query(sql, [vid], function (err, result) {
-            if (err) throw err;
-            var max = result[0]["max"];
-            if (max == 0) {
-                res.status(200).send({ "status": false, "Message": "Maximum Requests Reached" });
-            }
-            else {
-                max = max - 1;
-                var sql = "UPDATE visits SET maxRequests = ? WHERE ID = ?;";
-                db.query(sql, [max, vid], function (err, result) {
+        var max = result[0]["max"];
+        if (max == 0) {
+            res.status(200).send({ "status": false, "Message": "Maximum Requests Reached!" });
+        }
+        else {
+            max = max - 1;
+            var sql = "UPDATE visits SET maxRequests = ? WHERE ID = ?;";
+            db.query(sql, [max, vid], function (err, result) {
+                if (err) throw err;
+                var sql = "INSERT into requests (Description, UID, VID) values (?, ?, ?);";
+                db.query(sql, [description, uid, vid], function (err, result) {
                     if (err) throw err;
-                    res.status(200).send({ "status": true, "Message": "Your Request to visit having ID " + vid + " submitted successfully!" });
+                    res.status(200).send({ "status": true, "Message": "Request Placed Successfully!" });
                 });
-            }
-
-        });
-
+            });
+        }
     });
 });
 
