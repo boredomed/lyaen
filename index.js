@@ -209,8 +209,9 @@ app.get('/users/:uid/visits/:vid/requests', function (req, res) {
     });
 });
 
-app.get('/users/:uid/requests', function (req, res) {
-    var uid = req.params.uid;
+//View request of a particular user
+app.get('/requests', function (req, res) {
+    var uid = req.session.user;
     var sql = "select * from requests where UID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
