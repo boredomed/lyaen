@@ -282,17 +282,19 @@ app.put('/visit', function (req, res) {
     var uid = req.session.user;
     var vid = req.body.vid;
     var comingstatus = req.body.status;
-    var sql = "SELECT status from visits WHERE VID = ?;";
+    var sql = "SELECT status from visits WHERE ID = ?;";
     db.query(sql, [vid], function (err, result) {
         if (err) throw err;
         var status = result[0]["status"];
         if (status == "Cancelled") {
-            res.status(200).send("Sorry! You cannot change the status of an already cancelled visit!");
+            res.status(200).send({ "status":false, "Message":"Sorry! You cannot change the status of an already cancelled visit!"});
         }
         else if (status == "Completed") {
-            res.status(200).send("Sorry! You cannot change the status of an already completed visit!");
+            res.status(200).send({ "status":false, "Message":"Sorry! You cannot change the status of an already completed visit!"});
         }
         else {
+            console.log(status);
+            console.log(comingstatus);
             if (comingstatus == "Cancelled") {
                 var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
                 db.query(sql, [status, vid], function (err, result) {
@@ -324,7 +326,7 @@ app.put('/visit', function (req, res) {
                                     db.query(sql, [points, uid], function (err, result) {
                                         if (err) throw err;
                                         var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
-                                        db.query(sql, [status, vid], function (err, result) {
+                                        db.query(sql, [comingstatus, vid], function (err, result) {
                                             if (err) throw err;
                                             res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
                                         });
