@@ -258,7 +258,7 @@
             .then(data => {
               if (data.status == true)
                 $(".resheading").text("Request Generated");
-              else $(".resheading").text("Error generating request");
+              else $(".resheading").text(data.Message);
 
             })
             .then(response => {

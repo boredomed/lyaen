@@ -121,7 +121,7 @@
 
           <!-- Modal Header -->
           <div class="modal-header">
-            <h4 class="modal-title">Update status of visit</h4>
+            <h4 class="modal-title">View your Requests</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
 
@@ -177,8 +177,8 @@
   <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 
   <script>
-    //Getting all visits data and displaying in table
-    const request2 = new Request('http://localhost:3000/myvisits', { method: 'GET', mode: 'cors' });
+    //Getting all requests data and displaying in table
+    const request2 = new Request('http://localhost:3000/requests', { method: 'GET', mode: 'cors' });
     fetch(request2)
       .then(response => {
         if (response.status === 200) {
@@ -204,7 +204,7 @@
           var c = [];
           c.push("<thead><tr><strong>");
           for (var i = 0; i < col.length - 1; i++) {
-            if (col[i] == 'maxRequests') col[i] = "Max Requests";
+            //if (col[i] == 'maxRequests') col[i] = "Max Requests";
             c.push("<th>" + col[i] + "</th>");
           }
           c.push("</strong></tr></thead><tbody>");
