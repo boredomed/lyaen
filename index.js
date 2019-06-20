@@ -341,9 +341,9 @@ app.put('/visit', function (req, res) {
     });
 });
 
-app.put('/users/:uid/requests/:rid', function (req, res) {
-    var uid = req.params.uid;
-    var rid = req.params.rid;
+app.put('/request', function (req, res) {
+    var uid = req.session.user;
+    var rid = req.body.rid;
     var status = req.body.status;
     var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
     db.query(sql, [status, rid], function (err, result) {
