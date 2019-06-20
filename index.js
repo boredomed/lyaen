@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs@123",
-    database: "nodeapp"
+    password: "seecs123",
+    database: "lyaen"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-//client.auth("seecs123");
+client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -280,49 +280,62 @@ app.put('/users/:uid/visits/:vid/requests/:rid', function (req, res) {
 app.put('/visit', function (req, res) {
     var uid = req.session.user;
     var vid = req.body.vid;
-    var status = req.body.status;
-    if (status == "Cancelled") {
-        var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
-        db.query(sql, [status, vid], function (err, result) {
-            if (err) throw err;
-            res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
-        });
-    }
-    else {
-        var sql = "SELECT count(*) as notavailable from requests WHERE (status = 'Not Available' OR status = 'Accepted' OR status = 'Requested') and VID = ?;";
-        db.query(sql, [vid], function (err, result) {
-            if (err) throw err;
-            var na_requests = result[0]["notavailable"];
-            if (na_requests > 0) {
-                res.status(200).send({ "status": true, "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
-            }
-            else {
-                var sql = "SELECT points from users WHERE ID = ?;";
-                db.query(sql, [uid], function (err, result) {
+    var comingstatus = req.body.status;
+    var sql = "SELECT status from visits WHERE VID = ?;";
+    db.query(sql, [vid], function (err, result) {
+        if (err) throw err;
+        var status = result[0]["status"];
+        if (status == "Cancelled") {
+            res.status(200).send("Sorry! You cannot change the status of an already cancelled visit!");
+        }
+        else if (status == "Completed") {
+            res.status(200).send("Sorry! You cannot change the status of an already completed visit!");
+        }
+        else {
+            if (comingstatus == "Cancelled") {
+                var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
+                db.query(sql, [status, vid], function (err, result) {
                     if (err) throw err;
-                    var previous_points = result[0]["points"];
-                    var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = ?;";
-                    db.query(sql, [vid], function (err, result) {
-                        if (err) throw err;
-                        var completed_requests = result[0]["completed"];
-                        if (completed_requests > 0) {
-                            var points = (completed_requests * 5) + 5;
-                            points = previous_points + points;
-                            var sql = "UPDATE users SET points = ? WHERE ID = ?;";
-                            db.query(sql, [points, uid], function (err, result) {
-                                if (err) throw err;
-                                var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
-                                db.query(sql, [status, vid], function (err, result) {
-                                    if (err) throw err;
-                                    res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
-                                });
-                            });
-                        }
-                    });
+                    res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
                 });
             }
-        });
-    }
+            else {
+                var sql = "SELECT count(*) as notavailable from requests WHERE (status = 'Not Available' OR status = 'Accepted' OR status = 'Requested') and VID = ?;";
+                db.query(sql, [vid], function (err, result) {
+                    if (err) throw err;
+                    var na_requests = result[0]["notavailable"];
+                    if (na_requests > 0) {
+                        res.status(200).send({ "status": true, "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
+                    }
+                    else {
+                        var sql = "SELECT points from users WHERE ID = ?;";
+                        db.query(sql, [uid], function (err, result) {
+                            if (err) throw err;
+                            var previous_points = result[0]["points"];
+                            var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = ?;";
+                            db.query(sql, [vid], function (err, result) {
+                                if (err) throw err;
+                                var completed_requests = result[0]["completed"];
+                                if (completed_requests > 0) {
+                                    var points = (completed_requests * 5) + 5;
+                                    points = previous_points + points;
+                                    var sql = "UPDATE users SET points = ? WHERE ID = ?;";
+                                    db.query(sql, [points, uid], function (err, result) {
+                                        if (err) throw err;
+                                        var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
+                                        db.query(sql, [status, vid], function (err, result) {
+                                            if (err) throw err;
+                                            res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
+                                        });
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        }
+    });
 });
 
 app.put('/users/:uid/requests/:rid', function (req, res) {
