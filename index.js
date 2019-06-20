@@ -293,8 +293,6 @@ app.put('/visit', function (req, res) {
             res.status(200).send({ "status":false, "Message":"Sorry! You cannot change the status of an already completed visit!"});
         }
         else {
-            console.log(status);
-            console.log(comingstatus);
             if (comingstatus == "Cancelled") {
                 var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
                 db.query(sql, [status, vid], function (err, result) {
