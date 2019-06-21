@@ -163,7 +163,7 @@ app.get('/users/:uid', function (req, res) {
 
 app.get('/visits', function (req, res) {
     var uid = req.session.user;
-    var sql = "SELECT ID, Description, Destination, Timestamp, maxRequests, Status, Name FROM `users` NATURAL JOIN `visits` WHERE status = 'Announced' AND UID <> ? ORDER BY Timestamp;";
+    var sql = "SELECT Name, Description, Destination, Timestamp, maxRequests, Status, ID FROM `users` NATURAL JOIN `visits` WHERE status = 'Announced' AND UID <> ? ORDER BY Timestamp;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
         res.status(200).send(result);
@@ -213,7 +213,7 @@ app.get('/visits/:vid/requests', function (req, res) {
 //View request of a particular user
 app.get('/requests', function (req, res) {
     var uid = req.session.user;
-    var sql = "select * from requests where UID = ?;";
+    var sql = "SELECT users.Name, requests.Description, requests.Status, requests.UID, requests.VID, requests.ID FROM requests JOIN visits JOIN users WHERE requests.VID = visits.ID AND visits.UID = users.ID AND requests.UID = ?;";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
         res.status(200).send(result);

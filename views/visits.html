@@ -206,7 +206,7 @@
       // EXTRACT VALUE FOR HTML HEADER. 
       var response = data;
       var col = [];
-      for (var i = 0; i < response.length; i++) {
+      for (var i = 0; i < response.length - 1; i++) {
         for (var key in response[i]) {
           if (col.indexOf(key) === -1) {
             col.push(key);
@@ -216,8 +216,9 @@
       //Placing header in the table head
       var c = [];
       c.push("<thead><tr><strong>");
-      for (var i = 0; i < col.length - 1; i++) {
+      for (var i = 1; i < col.length - 1; i++) {
         if (col[i] == 'maxRequests') col[i] = "Max Requests";
+        if (col[i] == 'Timestamp') col[i] = "Date & Time";
         c.push("<th>" + col[i] + "</th>");
       }
       c.push("<th>" + "Requests" + "</th>");
@@ -225,14 +226,14 @@
 
       //placing data in table body
       $.each(response, function (i, item) {
-        c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
-        $('tr').attr('id', item.ID);
-        c.push("<td>" + item.Description + "</td>");
+        //c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+        //$('tr').attr('id', item.ID);
+        c.push("<tr id = " + item.ID + "><td>" + item.Description + "</td>");
         c.push("<td>" + item.Destination + "</td>");
         c.push("<td>" + formatTime(item.Timestamp) + "</td>");
         c.push("<td>" + item.maxRequests + "</td>");
         c.push("<td>" + item.Status + "</td>");
-        c.push("<td>" + "view" + "</td></tr>");
+        c.push("<td>" + "View" + "</td></tr>");
 
       });
       c.push("</tbody>");
@@ -263,22 +264,21 @@
     var stat;
     //opening modal
     $(document).ready(function () {
-      $(document).on("click", "#t1 tbody tr", function () {
-        var x1 = $(this).find("td").eq(4).html();
-        var id = $(this).attr('id');
+      $(document).on("click", "#t1 tbody tr td", function () {
+        //var x1 = $(this).find("td").eq(4).html();
+        var id = $(this).closest('tr').attr('id');
         vid = id;
+        var x1 = $("#"+vid).find("td").eq(4).html();
         if (x1 == "Announced") {
-          $(document).on("click", "#t1 tbody tr td", function () {
-            console.log(vid);
             $("#updateresp").hide();
             $("#dropval").show();
-            var x2 = $(this).html();
-            if (x2 == "view") {
+            var x2 = $(this).text();
+            console.log(x2);
+            if (x2 == "View") {
               $('#modal').modal('hide');
               window.location.href = "visitRequests.html?vid=" + vid;
             }
             else $('#modal').modal('show');
-          });
         } else $('#modal').modal('hide');
       });
       $(document).on("click", '#dropd2 a', function () {
