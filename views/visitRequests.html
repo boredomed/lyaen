@@ -111,9 +111,9 @@
   </section>
   <!--/.Navbar -->
   <div class="container">
-    <h1 class="card-title" style="text-align: center; margin-top: 10px; ">My Request</h1>
-    <h6 class="card-title" style="text-align: center; margin-top: 5px; ">Change the status of Requests that are <b>Not
-        Available</b> to Completed/Cancelled</h6>
+    <h1 class="card-title" style="text-align: center; margin-top: 10px; ">Requests Placed</h1>
+    <h6 class="card-title" style="text-align: center; margin-top: 5px; ">Change the status of Requests that are <b></b>
+      Placed on your visit</h6>
 
     <!-- Filter -->
     <div class="dropdown" style=" margin-bottom: 30px;">
@@ -222,7 +222,11 @@
     };
 
     var filterstatus = "start";
-    const request2 = new Request('http://localhost:3000/requests', { method: 'GET', mode: 'cors' });
+    var urlParams = new URLSearchParams(window.location.search);
+    var url = "http://localhost:3000/visits";
+    var vid1 = urlParams.getAll('vid')[0];
+    var url2 = ""
+    const request2 = new Request(url, { method: 'GET', mode: 'cors' });
     fetch(request2)
       .then(response => {
         if (response.status === 200) {
