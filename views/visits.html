@@ -211,13 +211,15 @@
 
           //placing data in table body
           $.each(response, function (i, item) {
-            c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
-            $('tr').attr('id', item.ID);
-            c.push("<td>" + item.Description + "</td>");
-            c.push("<td>" + item.Destination + "</td>");
-            c.push("<td>" + item.Timestamp + "</td>");
-            c.push("<td>" + item.maxRequests + "</td>");
-            c.push("<td>" + item.Status + "</td></tr>");
+            if (item.Status != "Cancelled") {
+              c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+              $('tr').attr('id', item.ID);
+              c.push("<td>" + item.Description + "</td>");
+              c.push("<td>" + item.Destination + "</td>");
+              c.push("<td>" + item.Timestamp + "</td>");
+              c.push("<td>" + item.maxRequests + "</td>");
+              c.push("<td>" + item.Status + "</td></tr>");
+            }
           });
           c.push("</tbody>");
           $('#t1').html(c.join(""));
@@ -248,7 +250,6 @@
 
       })
     });
-
 
     $(document).on("click", "#buton", function () {
 
