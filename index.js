@@ -163,7 +163,7 @@ app.get('/users/:uid', function (req, res) {
 
 app.get('/visits', function (req, res) {
     var uid = req.session.user;
-    var sql = "SELECT Name, Description, Destination, Timestamp, maxRequests, Status, ID FROM `users` NATURAL JOIN `visits` WHERE status = 'Announced' AND UID <> ? ORDER BY Timestamp;";
+    var sql = "SELECT users.Name, visits.Description, visits.Destination, visits.Timestamp, visits.maxRequests, visits.Status, visits.ID FROM visits JOIN users WHERE visits.UID = users.ID AND status = 'Announced' AND UID <> ? ORDER BY Timestamp";
     db.query(sql, [uid], function (err, result) {
         if (err) throw err;
         res.status(200).send(result);
