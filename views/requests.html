@@ -193,7 +193,7 @@
       // EXTRACT VALUE FOR HTML HEADER. 
       var response = data;
       var col = [];
-      for (var i = 0; i < response.length; i++) {
+      for (var i = 0; i < response.length - 1; i++) {
         for (var key in response[i]) {
           if (col.indexOf(key) === -1) {
             col.push(key);
@@ -203,7 +203,7 @@
       //Placing header in the table head
       var c = [];
       c.push("<thead><tr><strong>");
-      for (var i = 0; i < col.length - 2; i++) {
+      for (var i = 1; i < col.length - 2; i++) {
         c.push("<th>" + col[i] + "</th>");
       }
       c.push("</strong></tr></thead><tbody>");
@@ -211,9 +211,9 @@
       //placing data in table body
       $.each(response, function (i, item) {
         if (item.Status == filterstatus || filterstatus == "start") {
-          c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
-          $('tr').attr('id', item.ID);
-          c.push("<td>" + item.Description + "</td>");
+          c.push("<td>" + item.ID + "</td>");
+          //$('tr').attr('id', item.ID);
+          c.push("<tr id = " + item.ID + "><td>" + item.Description + "</td>");
           c.push("<td>" + item.Status + "</td></tr>");
         }
       });
