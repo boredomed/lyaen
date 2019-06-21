@@ -299,7 +299,7 @@ app.put('/visit', function (req, res) {
                 db.query(sql, [vid], function (err, result) {
                     if (err) throw err;
                     var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
-                    db.query(sql, [status, vid], function (err, result) {
+                    db.query(sql, [comingstatus, vid], function (err, result) {
                         if (err) throw err;
                         res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
                     });
