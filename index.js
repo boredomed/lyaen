@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs@123",
-    database: "nodeapp"
+    password: "seecs123",
+    database: "lyaen"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-//client.auth("seecs123");
+client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -162,8 +162,9 @@ app.get('/users/:uid', function (req, res) {
 });
 
 app.get('/visits', function (req, res) {
-    var sql = "select * from visits where status = 'Announced' ;";
-    db.query(sql, function (err, result) {
+    var uid = req.session.user;
+    var sql = "SELECT ID, Description, Destination, Timestamp, maxRequests, Status, Name FROM `users` NATURAL JOIN `visits` WHERE status = 'Announced' AND UID <> ? ORDER BY Timestamp;";
+    db.query(sql, [uid], function (err, result) {
         if (err) throw err;
         res.status(200).send(result);
     })

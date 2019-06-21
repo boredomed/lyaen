@@ -14,7 +14,7 @@
 
   <!-- #region datatables files -->
   <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" />
-   <!-- JQuery -->
+  <!-- JQuery -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
     const request1 = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
@@ -142,8 +142,10 @@
 
             </div>
             <div class="modal-footer">
-              <button id="buton" style="font-size: 1rem;font-family: inherit" type="button" class="btn btn-info btn-md">Save changes</button>
-              <button id="buton1" style="font-size: 1rem;font-family: inherit" type="button" class="btn btn-danger btn-md"  class="btn btn-secondary btn-md" data-dismiss="modal">Close</button>
+              <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
+                class="btn btn-info btn-md">Save changes</button>
+              <button id="buton1" style="font-size: 1rem;font-family: inherit" type="button"
+                class="btn btn-danger btn-md" class="btn btn-secondary btn-md" data-dismiss="modal">Close</button>
             </div>
           </div>
         </div>
@@ -157,7 +159,7 @@
 
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-   
+
     <!-- Bootstrap tooltips -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"> </script>
     <!-- Bootstrap
@@ -167,7 +169,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/js/mdb.min.js"></script>
     <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
     <script>
-
+      function formatTime(ISOTimestamp) {
+        var formattedTimestamp = new Date(ISOTimestamp);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var year = formattedTimestamp.getFullYear();
+        var month = months[formattedTimestamp.getMonth()];
+        var date = formattedTimestamp.getDate();
+        var hours = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+        var hour = hours[formattedTimestamp.getHours()];
+        if (formattedTimestamp.getHours() < 12) {
+          var AMPM = 'AM';
+        }
+        else {
+          var AMPM = 'PM';
+        }
+        var min = formattedTimestamp.getMinutes();
+        var sec = formattedTimestamp.getSeconds();
+        if (min < 10) {
+          min = "0" + min;
+        }
+        return timestamp = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ' ' + AMPM;
+      }
       //Getting all visits data and displaying in table 
       const request = new Request('http://localhost:3000/visits', { method: 'GET', mode: 'cors' });
       fetch(request)
@@ -206,7 +228,7 @@
               $('tr').attr('id', item.ID);
               c.push("<td>" + item.Description + "</td>");
               c.push("<td>" + item.Destination + "</td>");
-              c.push("<td>" + item.Timestamp + "</td>");
+              c.push("<td>" + formatTime(item.Timestamp) + "</td>");
               c.push("<td>" + item.maxRequests + "</td>");
               c.push("<td>" + item.Status + "</td></tr>");
             });
