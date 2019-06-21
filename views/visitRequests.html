@@ -152,7 +152,9 @@
               </button>
               <h6 id="updateresp"></h6>
               <div id="dropd2" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item">Cancelled</a>
+                <a class="dropdown-item">Accepted</a>
+                <a class="dropdown-item">Declined</a>
+                <a class="dropdown-item">Not Available</a>
                 <a class="dropdown-item">Completed</a>
               </div>
             </div>
@@ -163,7 +165,7 @@
             <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
               class="btn btn-info btn-md">Save
               changes</button>
-            <button type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
+            <button id = "cbutton" type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
               data-dismiss="modal">Close</button>
           </div>
 
@@ -223,10 +225,12 @@
 
     var filterstatus = "start";
     var urlParams = new URLSearchParams(window.location.search);
-    var url = "http://localhost:3000/visits";
+    var url = "http://localhost:3000/visits/";
     var vid1 = urlParams.getAll('vid')[0];
-    var url2 = ""
-    const request2 = new Request(url, { method: 'GET', mode: 'cors' });
+    var url2 = "/requests"
+    var finalurl = url + vid1 + url2;
+    console.log(finalurl);
+    const request2 = new Request(finalurl, { method: 'GET', mode: 'cors' });
     fetch(request2)
       .then(response => {
         if (response.status === 200) {
@@ -262,7 +266,7 @@
         $("#updateresp").hide();
         $("#dropval").show();
         var x1 = $(this).find("td").eq(2).html();
-        //if(x1 == "Not Available")
+        if(x1 == "Accepted" || x1 == "Requested")
         $('#modal').modal('show');
       });
 
@@ -270,6 +274,10 @@
         stat = ($(this).text());
         $("#dropval").html(stat);
       })
+
+      $(document).on("click", "#cbutton", function () {
+          location.reload();
+        })
 
     });
 

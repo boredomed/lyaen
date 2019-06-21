@@ -145,7 +145,7 @@
             <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
               class="btn btn-info btn-md">Save
               changes</button>
-            <button type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
+            <button id = "cbutton" type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
               data-dismiss="modal">Close</button>
           </div>
 
@@ -264,7 +264,7 @@
     //opening modal
     $(document).ready(function () {
       $(document).on("click", "#t1 tbody tr", function () {
-        var x1 = $(this).find("td").eq(5).html();
+        var x1 = $(this).find("td").eq(4).html();
         var id = $(this).attr('id');
         vid = id;
         if (x1 == "Announced") {
@@ -286,6 +286,10 @@
         $("#dropval").html(stat);
 
       })
+
+      $(document).on("click", "#cbutton", function () {
+          location.reload();
+        })
     });
 
     $(document).on("click", "#buton", function () {
