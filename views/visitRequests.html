@@ -165,8 +165,8 @@
             <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
               class="btn btn-info btn-md">Save
               changes</button>
-            <button id="cbutton" type="button" style="font-size: 1rem;font-family: inherit"
-              class="btn btn-danger btn-md" data-dismiss="modal">Close</button>
+            <button id = "cbutton" type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
+              data-dismiss="modal">Close</button>
           </div>
 
         </div>
@@ -205,8 +205,7 @@
       //Placing header in the table head
       var c = [];
       c.push("<thead><tr><strong>");
-      for (var i = 0; i < col.length - 3; i++) {
-        if (col[i] == 'Name') col[i] = "Requestor's Name";
+      for (var i = 0; i < col.length - 2; i++) {
         c.push("<th>" + col[i] + "</th>");
       }
       c.push("</strong></tr></thead><tbody>");
@@ -214,8 +213,8 @@
       //placing data in table body
       $.each(response, function (i, item) {
         if (item.Status == filterstatus || filterstatus == "start") {
-          c.push("<tr id = " + item.ID + "><td>" + item.Name + "</td>");
-          //$('tr').attr('id', item.ID);
+          c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+          $('tr').attr('id', item.ID);
           c.push("<td>" + item.Description + "</td>");
           c.push("<td>" + item.Status + "</td></tr>");
         }
@@ -230,13 +229,12 @@
     var vid1 = urlParams.getAll('vid')[0];
     var url2 = "/requests"
     var finalurl = url + vid1 + url2;
+    console.log(finalurl);
     const request2 = new Request(finalurl, { method: 'GET', mode: 'cors' });
     fetch(request2)
       .then(response => {
         if (response.status === 200) {
           return response.json();
-        } else if (response.status === 401) {
-          window.location.replace("/");
         } else {
           throw new Error('Something went wrong on api server!');
         }
@@ -268,8 +266,8 @@
         $("#updateresp").hide();
         $("#dropval").show();
         var x1 = $(this).find("td").eq(2).html();
-        if (x1 == "Accepted" || x1 == "Requested")
-          $('#modal').modal('show');
+        if(x1 == "Accepted" || x1 == "Requested")
+        $('#modal').modal('show');
       });
 
       $(document).on("click", '#dropd2 a', function () {
@@ -278,16 +276,17 @@
       })
 
       $(document).on("click", "#cbutton", function () {
-        location.reload();
-      })
+          location.reload();
+        })
 
     });
+
     $(document).on("click", "#buton", function () {
+
       //updating the status data
       var obj1 = {
         status: stat,
-        rid: rid,
-        vid: vid1
+        rid: rid
       }
       const request3 = new Request('http://localhost:3000/request', { method: 'PUT', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj1) });
 
@@ -296,8 +295,6 @@
         .then(response => {
           if (response.status === 200) {
             return response.json();
-          } else if (response.status === 401) {
-            window.location.replace("/");
           } else {
             throw new Error('Something went wrong on api server!');
           }
