@@ -84,7 +84,7 @@
           <li class="nav-item">
             <a class="nav-link" href="/home.html">Home </a>
           </li>
-          <li class="nav-item">
+          <li class="nav-item active">
             <a class="nav-link" href="/visits.html">Visits</a>
           </li>
           <li class="nav-item">
@@ -177,6 +177,28 @@
   <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 
   <script>
+    function formatTime(ISOTimestamp) {
+        var formattedTimestamp = new Date(ISOTimestamp);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var year = formattedTimestamp.getFullYear();
+        var month = months[formattedTimestamp.getMonth()];
+        var date = formattedTimestamp.getDate();
+        var hours = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+        var hour = hours[formattedTimestamp.getHours()];
+        if (formattedTimestamp.getHours() < 12) {
+          var AMPM = 'AM';
+        }
+        else {
+          var AMPM = 'PM';
+        }
+        var min = formattedTimestamp.getMinutes();
+        var sec = formattedTimestamp.getSeconds();
+        if (min < 10) {
+          min = "0" + min;
+        }
+        return timestamp = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ' ' + AMPM;
+      }
+
     //creating table
 
     function mytable(data) {
@@ -184,7 +206,7 @@
       // EXTRACT VALUE FOR HTML HEADER. 
       var response = data;
       var col = [];
-      for (var i = 0; i < response.length; i++) {
+      for (var i = 0; i < response.length -1 ; i++) {
         for (var key in response[i]) {
           if (col.indexOf(key) === -1) {
             col.push(key);
@@ -194,7 +216,7 @@
       //Placing header in the table head
       var c = [];
       c.push("<thead><tr><strong>");
-      for (var i = 0; i < col.length - 1; i++) {
+      for (var i = 1; i < col.length - 1; i++) {
         if (col[i] == 'maxRequests') col[i] = "Max Requests";
         c.push("<th>" + col[i] + "</th>");
       }
@@ -203,11 +225,11 @@
 
       //placing data in table body
       $.each(response, function (i, item) {
-        c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+        //c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
         $('tr').attr('id', item.ID);
-        c.push("<td>" + item.Description + "</td>");
+        c.push("<tr id = " + item.ID + "><td>" + item.Description + "</td>");
         c.push("<td>" + item.Destination + "</td>");
-        c.push("<td>" + item.Timestamp + "</td>");
+        c.push("<td>" + formatTime(item.Timestamp) + "</td>");
         c.push("<td>" + item.maxRequests + "</td>");
         c.push("<td>" + item.Status + "</td>");
         c.push("<td>" + "view" + "</td></tr>");
