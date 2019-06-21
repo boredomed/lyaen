@@ -163,7 +163,7 @@
             <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
               class="btn btn-info btn-md">Save
               changes</button>
-            <button type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
+            <button id = "button1" type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
               data-dismiss="modal">Close</button>
           </div>
 
@@ -235,10 +235,10 @@
         mytable(data);
         $(document).on("click", '#dropd3 a', function () {
           filterstatus = ($(this).text());
-          //console.log(filterstatus);
           $("#dropval1").html(filterstatus);
           mytable(data);
         })
+
       })
       .then(response => {
         console.debug(response);
@@ -258,14 +258,18 @@
         $("#updateresp").hide();
         $("#dropval").show();
         var x1 = $(this).find("td").eq(2).html();
-        if(x1 == "Not Available")
-        $('#modal').modal('show');
+        if (x1 == "Not Available")
+          $('#modal').modal('show');
       });
 
       $(document).on("click", '#dropd2 a', function () {
         stat = ($(this).text());
         $("#dropval").html(stat);
       })
+
+      $(document).on("click", "#button1", function () {
+          location.reload();
+        })
 
     });
 
@@ -300,6 +304,7 @@
       $("#updateresp").show();
       $("#dropval").hide();
     })
+
 
   </script>
 </body>

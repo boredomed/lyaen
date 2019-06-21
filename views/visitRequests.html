@@ -165,7 +165,7 @@
             <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
               class="btn btn-info btn-md">Save
               changes</button>
-            <button type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
+            <button id = "cbutton" type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
               data-dismiss="modal">Close</button>
           </div>
 
@@ -274,6 +274,10 @@
         stat = ($(this).text());
         $("#dropval").html(stat);
       })
+
+      $(document).on("click", "#cbutton", function () {
+          location.reload();
+        })
 
     });
 
