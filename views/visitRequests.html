@@ -111,7 +111,25 @@
   </section>
   <!--/.Navbar -->
   <div class="container">
-    <h1 class="card-title" style="text-align: center; margin-top: 10px; ">My visits</h1>
+    <h1 class="card-title" style="text-align: center; margin-top: 10px; ">My Request</h1>
+    <h6 class="card-title" style="text-align: center; margin-top: 5px; ">Change the status of Requests that are <b>Not
+        Available</b> to Completed/Cancelled</h6>
+
+    <!-- Filter -->
+    <div class="dropdown" style=" margin-bottom: 30px;">
+      <button id="dropval1" class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Filter
+      </button>
+      <div id="dropd3" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item">Not Available</a>
+        <a class="dropdown-item">Completed</a>
+        <a class="dropdown-item">Cancelled</a>
+        <a class="dropdown-item">Requested</a>
+      </div>
+    </div>
+
+
     <table id="t1" class="table table-hover" style="background-color:azure"></table>
 
     <!-- The Modal -->
@@ -121,7 +139,7 @@
 
           <!-- Modal Header -->
           <div class="modal-header">
-            <h4 class="modal-title">Update status of visit</h4>
+            <h4 class="modal-title">Update status of Request</h4>
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
 
@@ -153,13 +171,6 @@
       </div>
     </div>
   </div>
-  <!-- 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="~/scripts/jquery-1.10.2.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script> -->
 
   <!-- Popper JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -177,10 +188,8 @@
   <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 
   <script>
-    //creating table
-
+    //Getting all visits data and displaying in table
     function mytable(data) {
-
       // EXTRACT VALUE FOR HTML HEADER. 
       var response = data;
       var col = [];
@@ -194,31 +203,26 @@
       //Placing header in the table head
       var c = [];
       c.push("<thead><tr><strong>");
-      for (var i = 0; i < col.length - 1; i++) {
-        if (col[i] == 'maxRequests') col[i] = "Max Requests";
+      for (var i = 0; i < col.length - 2; i++) {
         c.push("<th>" + col[i] + "</th>");
       }
-      c.push("<th>" + "Requests" + "</th>");
       c.push("</strong></tr></thead><tbody>");
 
       //placing data in table body
       $.each(response, function (i, item) {
-        c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
-        $('tr').attr('id', item.ID);
-        c.push("<td>" + item.Description + "</td>");
-        c.push("<td>" + item.Destination + "</td>");
-        c.push("<td>" + item.Timestamp + "</td>");
-        c.push("<td>" + item.maxRequests + "</td>");
-        c.push("<td>" + item.Status + "</td>");
-        c.push("<td>" + "view" + "</td></tr>");
-
+        if (item.Status == filterstatus || filterstatus == "start") {
+          c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+          $('tr').attr('id', item.ID);
+          c.push("<td>" + item.Description + "</td>");
+          c.push("<td>" + item.Status + "</td></tr>");
+        }
       });
       c.push("</tbody>");
       $('#t1').html(c.join(""));
-    }
+    };
 
-    //Getting all visits data and displaying in table
-    const request2 = new Request('http://localhost:3000/myvisits', { method: 'GET', mode: 'cors' });
+    var filterstatus = "start";
+    const request2 = new Request('http://localhost:3000/requests', { method: 'GET', mode: 'cors' });
     fetch(request2)
       .then(response => {
         if (response.status === 200) {
@@ -229,6 +233,12 @@
       })
       .then(data => {
         mytable(data);
+        $(document).on("click", '#dropd3 a', function () {
+          filterstatus = ($(this).text());
+          //console.log(filterstatus);
+          $("#dropval1").html(filterstatus);
+          mytable(data);
+        })
       })
       .then(response => {
         console.debug(response);
@@ -237,33 +247,26 @@
         console.error(error);
       });
 
-    var vid;
+    var rid;
     var stat;
+
     //opening modal
     $(document).ready(function () {
       $(document).on("click", "#t1 tbody tr", function () {
-        var x1 = $(this).find("td").eq(5).html();
         var id = $(this).attr('id');
-        vid = id;
-        if (x1 == "Announced") {
-          $(document).on("click", "#t1 tbody tr td", function () {
-            console.log(vid);
-            $("#updateresp").hide();
-            $("#dropval").show();
-            var x2 = $(this).html();
-            if (x2 == "view") {
-              $('#modal').modal('hide');
-              window.location.href = "visitRequests.html?vid=" + vid;
-            }
-            else $('#modal').modal('show');
-          });
-        } else $('#modal').modal('hide');
+        rid = id;
+        $("#updateresp").hide();
+        $("#dropval").show();
+        var x1 = $(this).find("td").eq(2).html();
+        //if(x1 == "Not Available")
+        $('#modal').modal('show');
       });
+
       $(document).on("click", '#dropd2 a', function () {
         stat = ($(this).text());
         $("#dropval").html(stat);
-
       })
+
     });
 
     $(document).on("click", "#buton", function () {
@@ -271,10 +274,9 @@
       //updating the status data
       var obj1 = {
         status: stat,
-        vid: vid
+        rid: rid
       }
-      console.log(obj1);
-      const request3 = new Request('http://localhost:3000/visit', { method: 'PUT', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj1) });
+      const request3 = new Request('http://localhost:3000/request', { method: 'PUT', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj1) });
 
       //updating the visit table
       fetch(request3)

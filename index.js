@@ -200,7 +200,7 @@ app.get('/users/:uid/visits/:vid', function (req, res) {
     });
 });
 
-app.get('/users/:uid/visits/:vid/requests', function (req, res) {
+app.get('/visits/:vid/requests', function (req, res) {
     var vid = req.params.vid;
     var sql = "select * from requests where VID = ?;";
     db.query(sql, [vid], function (err, result) {
