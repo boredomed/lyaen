@@ -64,45 +64,44 @@
 <!------ Include the above in your HEAD tag ---------->
 
 <body>
-    <section class="col-md-12">
-        <nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color">
-            <a class="navbar-brand" href="#">LYAEN</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarSupportedContent-333" aria-controls="navbarSupportedContent-333"
-                aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent-333">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/home.html">Home </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/visits.html">Visits</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/requests.html">Requests</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav ml-auto nav-flex-icons">
-                    <li class="nav-item">
-                        <a class="nav-link" id="navbarDropdownMenuLink-4" >
-                            <i class="fas fa-user"></i>
-                            <span id="name"></span>
-                        </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="logout()">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <span id="logout">Logout</span>
-                            </a>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </section>
-    <!--/.Navbar -->
+  <section class="col-md-12">
+    <nav class="mb-1 navbar navbar-expand-lg navbar-dark default-color">
+      <a class="navbar-brand" href="#">LYAEN</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-333"
+        aria-controls="navbarSupportedContent-333" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent-333">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/home.html">Home </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/visits.html">Visits</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/requests.html">Requests</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ml-auto nav-flex-icons">
+          <li class="nav-item">
+            <a class="nav-link" id="navbarDropdownMenuLink-4">
+              <i class="fas fa-user"></i>
+              <span id="name"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span id="logout">Logout</span>
+            </a>
+      </div>
+      </li>
+      </ul>
+      </div>
+    </nav>
+  </section>
+  <!--/.Navbar -->
   <div class="container">
     <!--CREATE VISIT-->
     <div id="visitbox" style="margin-top:30px" class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
@@ -218,6 +217,8 @@
           .then(response => {
             if (response.status === 200) {
               return response.json();
+            } else if (response.status === 401) {
+              window.location.replace("/");
             } else {
               throw new Error('Something went wrong on api server!');
             }

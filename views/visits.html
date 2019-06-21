@@ -206,7 +206,7 @@
       // EXTRACT VALUE FOR HTML HEADER. 
       var response = data;
       var col = [];
-      for (var i = 0; i < response.length - 1; i++) {
+      for (var i = 0; i < response.length; i++) {
         for (var key in response[i]) {
           if (col.indexOf(key) === -1) {
             col.push(key);
@@ -246,7 +246,9 @@
       .then(response => {
         if (response.status === 200) {
           return response.json();
-        } else {
+        } else if (response.status === 401) {
+          window.location.replace("/");
+        }else {
           throw new Error('Something went wrong on api server!');
         }
       })
@@ -307,7 +309,9 @@
         .then(response => {
           if (response.status === 200) {
             return response.json();
-          } else {
+          } else if (response.status === 401) {
+          window.location.replace("/");
+        }else {
             throw new Error('Something went wrong on api server!');
           }
         })
