@@ -13,7 +13,7 @@
         if (response.status === 200) {
           window.location.replace("/home.html");
         }
-        else if (response.status === 401){
+        else if (response.status === 401) {
           console.log("Authentication Failed!");
         }
         else {
@@ -149,19 +149,43 @@
                 <span style="margin-left:8px;">or</span>
               </div>
             </div>
-
-            <div style="border-top: 1px solid #999; padding-top:20px" class="form-group">
-
-              <div class="col-md-offset-3 col-md-9">
-                <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up
-                  with Facebook</button>
-              </div>
-
+    <!-- The Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+  
+            <!-- Modal Header -->
+            <div class="modal-header">
+              <h4 class="modal-title">Confirmation!</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-          </form>
+  
+            <!-- Modal body -->
+            <div class="modal-body">
+              Signup Successful!
+            </div>
+  
+            <!-- Modal footer -->
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+  
+          </div>
         </div>
       </div>
+
+        <div style="border-top: 1px solid #999; padding-top:20px" class="form-group">
+
+          <div class="col-md-offset-3 col-md-9">
+            <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up
+              with Facebook</button>
+          </div>
+
+        </div>
+        </form>
+      </div>
     </div>
+  </div>
   </div>
 
   <script>
@@ -214,8 +238,6 @@
         pwd1: password0,
         cpwd: password1
       }
-      console.log(obj1);
-
       const request = new Request('http://localhost:3000/signup', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj1) });
 
       fetch(request)
@@ -226,12 +248,17 @@
             throw new Error('Something went wrong on api server!');
           }
         })
+        .then(data => {
+          $('#modal').find('#r1').html(data.Message);
+        })
         .then(response => {
           console.debug(response);
           // ...
         }).catch(error => {
           console.error(error);
         });
+        
+        $('#modal').modal('show');
     }
   </script>
 

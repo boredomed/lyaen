@@ -203,7 +203,7 @@ app.get('/users/:uid/visits/:vid', function (req, res) {
 
 app.get('/visits/:vid/requests', function (req, res) {
     var vid = req.params.vid;
-    var sql = "select * from requests where VID = ?;";
+    var sql = "SELECT users.Name, requests.Description, requests.Status, requests.UID, requests.VID, requests.ID from requests JOIN users WHERE requests.UID = users.ID AND requests.VID = ?;";
     db.query(sql, [vid], function (err, result) {
         if (err) throw err;
         res.status(200).send(result);
@@ -348,6 +348,19 @@ app.put('/request', function (req, res) {
     var uid = req.session.user;
     var rid = req.body.rid;
     var status = req.body.status;
+    var vid = req.body.vid;
+    if (status == "Declined") {
+        var sql = "SELECT maxRequests as max from visits WHERE ID = ?;";
+        db.query(sql, [vid], function (err, result) {
+            if (err) throw err;
+            var maxRequests = result[0]["max"];
+            maxRequests = maxRequests + 1;
+            var sql = "UPDATE visits SET maxRequests = ? WHERE ID = ?;";
+            db.query(sql, [maxRequests, vid], function (err, result) {
+                if (err) throw err;
+            });
+        });
+    }
     var sql = "UPDATE requests SET status = ? WHERE ID = ?;";
     db.query(sql, [status, rid], function (err, result) {
         if (err) throw err;

@@ -196,6 +196,9 @@
         .then(response => {
           if (response.status === 200) {
             return response.json();
+          }
+          else if (response.status === 401) {
+            window.location.replace("/");
           } else {
             throw new Error('Something went wrong on api server!');
           }
@@ -218,14 +221,17 @@
             c.push("<thead><tr><strong>");
             for (var i = 0; i < col.length - 1; i++) {
               if (col[i] == 'maxRequests') col[i] = "Max Requests";
+              if (col[i] == 'Name') col[i] = "Visitor's Name";
+              if (col[i] == 'Timestamp') col[i] = "Date & Time";
               c.push("<th>" + col[i] + "</th>");
             }
             c.push("</strong></tr></thead><tbody>");
 
             //placing data in table body
             $.each(response, function (i, item) {
-              c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
-              $('tr').attr('id', item.ID);
+              //c.push("<tr id = " + item.ID + "><td>" + item.ID + "</td>");
+              //$('tr').attr('id', item.ID);
+              c.push("<tr id = " + item.ID + "><td>" + item.Name + "</td>");
               c.push("<td>" + item.Description + "</td>");
               c.push("<td>" + item.Destination + "</td>");
               c.push("<td>" + formatTime(item.Timestamp) + "</td>");
@@ -273,6 +279,8 @@
             .then(response => {
               if (response.status === 200) {
                 return response.json();
+              } else if (response.status === 401) {
+                window.location.replace("/");
               } else {
                 throw new Error('Something went wrong on api server!');
               }
@@ -292,7 +300,7 @@
         });
 
         $(document).on("click", "#buton1", function () {
-          //location.reload();
+          location.reload();
         })
       });
 

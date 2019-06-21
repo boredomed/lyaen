@@ -163,8 +163,8 @@
             <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
               class="btn btn-info btn-md">Save
               changes</button>
-            <button id = "button1" type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
-              data-dismiss="modal">Close</button>
+            <button id="button1" type="button" style="font-size: 1rem;font-family: inherit"
+              class="btn btn-danger btn-md" data-dismiss="modal">Close</button>
           </div>
 
         </div>
@@ -203,7 +203,8 @@
       //Placing header in the table head
       var c = [];
       c.push("<thead><tr><strong>");
-      for (var i = 1; i < col.length - 2; i++) {
+      for (var i = 0; i < col.length - 3; i++) {
+        if (col[i] == 'Name') col[i] = "Visitor's Name";
         c.push("<th>" + col[i] + "</th>");
       }
       c.push("</strong></tr></thead><tbody>");
@@ -211,9 +212,11 @@
       //placing data in table body
       $.each(response, function (i, item) {
         if (item.Status == filterstatus || filterstatus == "start") {
-          c.push("<td>" + item.ID + "</td>");
+          //c.push("<td>" + item.ID + "</td>");
           //$('tr').attr('id', item.ID);
-          c.push("<tr id = " + item.ID + "><td>" + item.Description + "</td>");
+
+          c.push("<tr id = " + item.ID + "><td>" + item.Name + "</td>");
+          c.push("<td>" + item.Description + "</td>")
           c.push("<td>" + item.Status + "</td></tr>");
         }
       });
@@ -227,6 +230,8 @@
       .then(response => {
         if (response.status === 200) {
           return response.json();
+        } else if (response.status === 401) {
+          window.location.replace("/");
         } else {
           throw new Error('Something went wrong on api server!');
         }
@@ -268,8 +273,8 @@
       })
 
       $(document).on("click", "#button1", function () {
-          location.reload();
-        })
+        location.reload();
+      })
 
     });
 
@@ -287,6 +292,8 @@
         .then(response => {
           if (response.status === 200) {
             return response.json();
+          } else if (response.status === 401) {
+            window.location.replace("/");
           } else {
             throw new Error('Something went wrong on api server!');
           }
