@@ -211,7 +211,7 @@
       //placing data in table body
       $.each(response, function (i, item) {
         if (item.Status == filterstatus || filterstatus == "start") {
-          //c.push("<td>" + item.ID + "</td>");
+          c.push("<td>" + item.ID + "</td>");
           //$('tr').attr('id', item.ID);
           c.push("<tr id = " + item.ID + "><td>" + item.Description + "</td>");
           c.push("<td>" + item.Status + "</td></tr>");
