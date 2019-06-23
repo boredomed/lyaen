@@ -145,21 +145,14 @@
             <button id="buton" style="font-size: 1rem;font-family: inherit" type="button"
               class="btn btn-info btn-md">Save
               changes</button>
-            <button id = "cbutton" type="button" style="font-size: 1rem;font-family: inherit" class="btn btn-danger btn-md"
-              data-dismiss="modal">Close</button>
+            <button id="cbutton" type="button" style="font-size: 1rem;font-family: inherit"
+              class="btn btn-danger btn-md" data-dismiss="modal">Close</button>
           </div>
 
         </div>
       </div>
     </div>
   </div>
-  <!-- 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-  <script src="~/scripts/jquery-1.10.2.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script> -->
 
   <!-- Popper JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -178,26 +171,26 @@
 
   <script>
     function formatTime(ISOTimestamp) {
-        var formattedTimestamp = new Date(ISOTimestamp);
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        var year = formattedTimestamp.getFullYear();
-        var month = months[formattedTimestamp.getMonth()];
-        var date = formattedTimestamp.getDate();
-        var hours = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
-        var hour = hours[formattedTimestamp.getHours()];
-        if (formattedTimestamp.getHours() < 12) {
-          var AMPM = 'AM';
-        }
-        else {
-          var AMPM = 'PM';
-        }
-        var min = formattedTimestamp.getMinutes();
-        var sec = formattedTimestamp.getSeconds();
-        if (min < 10) {
-          min = "0" + min;
-        }
-        return timestamp = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ' ' + AMPM;
+      var formattedTimestamp = new Date(ISOTimestamp);
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      var year = formattedTimestamp.getFullYear();
+      var month = months[formattedTimestamp.getMonth()];
+      var date = formattedTimestamp.getDate();
+      var hours = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+      var hour = hours[formattedTimestamp.getHours()];
+      if (formattedTimestamp.getHours() < 12) {
+        var AMPM = 'AM';
       }
+      else {
+        var AMPM = 'PM';
+      }
+      var min = formattedTimestamp.getMinutes();
+      var sec = formattedTimestamp.getSeconds();
+      if (min < 10) {
+        min = "0" + min;
+      }
+      return timestamp = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ' ' + AMPM;
+    }
 
     //creating table
 
@@ -233,7 +226,7 @@
         c.push("<td>" + formatTime(item.Timestamp) + "</td>");
         c.push("<td>" + item.maxRequests + "</td>");
         c.push("<td>" + item.Status + "</td>");
-        c.push("<td>" + "View" + "</td></tr>");
+        c.push("<td><a>" + "View" + "</a></td></tr>");
 
       });
       c.push("</tbody>");
@@ -248,7 +241,7 @@
           return response.json();
         } else if (response.status === 401) {
           window.location.replace("/");
-        }else {
+        } else {
           throw new Error('Something went wrong on api server!');
         }
       })
@@ -266,12 +259,13 @@
     var stat;
     //opening modal
     $(document).ready(function () {
-      $(document).on("click", "#t1 tbody tr td", function () {
-        //var x1 = $(this).find("td").eq(4).html();
-        var id = $(this).closest('tr').attr('id');
-        vid = id;
-        var x1 = $("#"+vid).find("td").eq(4).html();
-        if (x1 == "Announced") {
+
+        $(document).on("click", "#t1 tbody tr td", function () {
+          //var x1 = $(this).find("td").eq(4).html();
+          var id = $(this).closest('tr').attr('id');
+          vid = id;
+          var x1 = $("#" + vid).find("td").eq(4).html();
+          if (x1 != "Cancelled") {
             $("#updateresp").hide();
             $("#dropval").show();
             var x2 = $(this).text();
@@ -280,53 +274,54 @@
               window.location.href = "visitRequests.html?vid=" + vid;
             }
             else $('#modal').modal('show');
-        } else $('#modal').modal('hide');
-      });
-      $(document).on("click", '#dropd2 a', function () {
-        stat = ($(this).text());
-        $("#dropval").html(stat);
-
-      })
-
-      $(document).on("click", "#cbutton", function () {
-          location.reload();
-        })
-    });
-
-    $(document).on("click", "#buton", function () {
-
-      //updating the status data
-      var obj1 = {
-        status: stat,
-        vid: vid
-      }
-      console.log(obj1);
-      const request3 = new Request('http://localhost:3000/visit', { method: 'PUT', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj1) });
-
-      //updating the visit table
-      fetch(request3)
-        .then(response => {
-          if (response.status === 200) {
-            return response.json();
-          } else if (response.status === 401) {
-          window.location.replace("/");
-        }else {
-            throw new Error('Something went wrong on api server!');
-          }
-        })
-        .then(data => {
-          $("#updateresp").text(data.Message);
-        })
-        .then(response => {
-          console.debug(response);
-          // ...
-        }).catch(error => {
-          console.error(error);
+          } else $('#modal').modal('hide');
         });
 
-      $("#updateresp").show();
-      $("#dropval").hide();
-    })
+        $(document).on("click", '#dropd2 a', function () {
+          stat = ($(this).text());
+          $("#dropval").html(stat);
+
+        })
+
+        $(document).on("click", "#cbutton", function () {
+          location.reload();
+        })
+
+      });
+
+      $(document).on("click", "#buton", function () {
+
+        //updating the status data
+        var obj1 = {
+          status: stat,
+          vid: vid
+        }
+        const request3 = new Request('http://localhost:3000/visit', { method: 'PUT', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj1) });
+
+        //updating the visit table
+        fetch(request3)
+          .then(response => {
+            if (response.status === 200) {
+              return response.json();
+            } else if (response.status === 401) {
+              window.location.replace("/");
+            } else {
+              throw new Error('Something went wrong on api server!');
+            }
+          })
+          .then(data => {
+            $("#updateresp").text(data.Message);
+          })
+          .then(response => {
+            console.debug(response);
+            // ...
+          }).catch(error => {
+            console.error(error);
+          });
+
+        $("#updateresp").show();
+        $("#dropval").hide();
+      })
 
   </script>
 </body>

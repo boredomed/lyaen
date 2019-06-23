@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs123",
-    database: "lyaen"
+    password: "seecs@123",
+    database: "nodeapp"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-client.auth("seecs123");
+//client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,

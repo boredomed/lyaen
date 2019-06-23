@@ -35,7 +35,7 @@
       <div class="panel panel-info">
 
         <div class="panel-heading">
-          <div class="panel-title">Sign In</div>
+          <div class="panel-title"><h3>Sign In</h3></div>
           <div style="float:right; font-size: 80%; position: relative; top:-10px"><a href="#">Forgot password?</a></div>
         </div>
 
@@ -116,7 +116,8 @@
             <div class="form-group">
               <label for="email1" class="col-md-3 control-label">Email</label>
               <div class="col-md-9">
-                <input id="email1" type="text" class="form-control" name="email" placeholder="Email Address">
+                <input id="email1" type="text" class="form-control" name="email" placeholder="Email Address" onkeyup = "validateEmail()">
+                <div id='message3' style="margin-left: 8px"></div>
               </div>
             </div>
 
@@ -129,15 +130,19 @@
             <div class="form-group">
               <label for="password0" class="col-md-3 control-label">Password</label>
               <div class="col-md-9">
-                <input id="password0" type="password" class="form-control" name="passwd" placeholder="Password">
+                <input id="password0" type="password" class="form-control" name="passwd" placeholder="Password"
+                  onkeyup="passcheck()">
+                <div id='message1' style="margin-left: 8px"></div>
               </div>
             </div>
 
             <div class="form-group">
               <label for="namepas" class="col-md-6 control-label">Confirm Password</label>
               <div class="col-md-9">
-                <input id="namepas" type="password" class="form-control" name="cpass" placeholder="Confirm Password">
+                <input id="namepas" type="password" class="form-control" name="cpass" placeholder="Confirm Password"
+                  onkeyup="check()">
               </div>
+              <div id='message' style="margin-left: 22px"></div>
             </div>
 
             <div class="form-group">
@@ -149,43 +154,44 @@
                 <span style="margin-left:8px;">or</span>
               </div>
             </div>
-    <!-- The Modal -->
-    <div class="modal" id="modal">
-        <div class="modal-dialog">
-          <div class="modal-content">
-  
-            <!-- Modal Header -->
-            <div class="modal-header">
-              <h4 class="modal-title">Confirmation!</h4>
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <!-- The Modal -->
+            <div class="modal" id="modal">
+              <div class="modal-dialog">
+                <div class="modal-content">
+
+                  <!-- Modal Header -->
+                  <div class="modal-header">
+                    <h4 class="modal-title">Confirmation!</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+
+                  <!-- Modal body -->
+                  <div class="modal-body">
+                    Signup Successful!
+                  </div>
+
+                  <!-- Modal footer -->
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"
+                      onclick="$('#signupbox').hide(); $('#loginbox').show()">Close</button>
+                  </div>
+
+                </div>
+              </div>
             </div>
-  
-            <!-- Modal body -->
-            <div class="modal-body">
-              Signup Successful!
+
+            <div style="border-top: 1px solid #999; padding-top:20px" class="form-group">
+
+              <div class="col-md-offset-3 col-md-9">
+                <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up
+                  with Facebook</button>
+              </div>
+
             </div>
-  
-            <!-- Modal footer -->
-            <div class="modal-footer">
-              <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
-  
-          </div>
+          </form>
         </div>
-      </div>
-
-        <div style="border-top: 1px solid #999; padding-top:20px" class="form-group">
-
-          <div class="col-md-offset-3 col-md-9">
-            <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up
-              with Facebook</button>
-          </div>
-
-        </div>
-        </form>
       </div>
     </div>
-  </div>
   </div>
 
   <script>
@@ -257,8 +263,65 @@
         }).catch(error => {
           console.error(error);
         });
-        
-        $('#modal').modal('show');
+
+      $('#modal').modal('show');
+    }
+
+    function passcheck() {
+      var str = document.getElementById("password0").value;
+      var y = str.length;
+
+      var strength = 0;
+
+      var capital = new RegExp("[A-Z]");
+      var small = new RegExp("[a-z]");
+      var num = new RegExp("[1-9]");
+      var special = new RegExp("[{}/!@$%^&*()~]");
+
+      var colors = "white";
+      var strengthn = "";
+      var name = "Strength: ";
+
+      if (y > 1) { colors = "red"; strengthn = "Weak"; }
+      if (y > 7) strength++;
+      if (capital.test(str) && small.test(str)) strength++;
+      if (num.test(str)) strength++;
+      if (special.test(str)) strength++;
+
+      if (strength == 0) { }
+      else if (strength == 1) { colors = "red"; strengthn = "Weak"; }
+      else if (strength > 1 && strength < 4) { colors = "orange"; strengthn = "Good"; }
+      else if (strength == 4) { colors = "blue"; strengthn = "Strong"; }
+
+      document.getElementById("password0").style.borderColor = colors;
+      strengthn = name + strengthn;
+      document.getElementById("message1").innerHTML = strengthn;
+      document.getElementById("message1").style.color = colors;
+
+    }
+
+    function check() {
+      if (document.getElementById('password0').value ==
+        document.getElementById('namepas').value) {
+        document.getElementById('message').style.color = 'green';
+        document.getElementById('message').innerHTML = 'Password Matched';
+      } else {
+        document.getElementById('message').style.color = 'red';
+        document.getElementById('message').innerHTML = 'Not Matching';
+      }
+    }
+
+    function isEmail(email) {
+      var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+      return regex.test(email);
+    }
+
+    function validateEmail(){
+      var str = document.getElementById("email1").value;
+      if(!isEmail(str)){
+        document.getElementById('message3').style.color = 'red';
+        document.getElementById('message3').innerHTML = 'Invalid email address';
+      }else document.getElementById('message3').innerHTML = '';
     }
   </script>
 
