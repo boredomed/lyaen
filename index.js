@@ -111,11 +111,11 @@ app.post('/signup', function (req, res) {
 
         }
         else {
-            res.status(400).send({ "status": false, "Message": "Invalid Email!" });
+            res.status(200).send({ "status": false, "Message": "Invalid Email!" });
         }
     }
     else {
-        res.status(400).send({ "status": false, "Message": "Name can only contains Spaces or Alphabets!" });
+        res.status(200).send({ "status": false, "Message": "Name can only contains Spaces or Alphabets!" });
     }
 });
 
