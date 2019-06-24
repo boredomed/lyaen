@@ -53,16 +53,18 @@ app.post('/signin', function (req, res) {
     let email = req.body.email;
     let pwd = req.body.pwd;
     if (validateEmail(email)) {
-        let sql = "SELECT ID, Name, Pwd as hash from users WHERE Email = ?;";
+        let sql = "SELECT ID, Points, Name, Pwd as hash from users WHERE Email = ?;";
         db.query(sql, [email], function (err, result) {
             if (result.length > 0) {
                 var hash = result[0]["hash"];
                 var uid = result[0]["ID"];
                 var name = result[0]["Name"];
+                var points = result[0]["Points"];
                 bcrypt.compare(pwd, hash, function (err, response) {
                     if (response) {
                         req.session.user = uid;
                         req.session.username = name
+                        req.session.points = points; 
                         res.status(200).send({ "status": true, "Message": "Access Granted!" });
                     }
                     else {
@@ -133,7 +135,7 @@ app.use(function (req, res, next) {
 });
 
 app.get('/session', function (req, res) {
-    res.status(200).send({ "status": true, "Message": "Access Granted!", "ID": req.session.user, "name": req.session.username })
+    res.status(200).send({ "status": true, "Message": "Access Granted!", "ID": req.session.user, "name": req.session.username, "points": req.session.points })
 });
 
 app.get('/logout', function (req, res) {
