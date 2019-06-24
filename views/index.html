@@ -151,7 +151,8 @@
                 <button id="btn-signup" type="button" class="btn btn-info" onclick="signup()"><i
                     class="icon-hand-right"></i> &nbsp Sign
                   Up</button>
-                <span style="margin-left:8px;">or</span>
+                  <span id='message4' style="margin-left: 8px"></span>
+                <!--<span style="margin-left:8px;">or</span>-->
               </div>
             </div>
             <!-- The Modal -->
@@ -161,19 +162,17 @@
 
                   <!-- Modal Header -->
                   <div class="modal-header">
-                    <h4 class="modal-title">Confirmation!</h4>
+                    <h4 class="modal-title">Response!</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                   </div>
 
                   <!-- Modal body -->
-                  <div class="modal-body">
-                    Signup Successful!
-                  </div>
+                  <div id = "modal1" class="modal-body"></div>
 
                   <!-- Modal footer -->
                   <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal"
-                      onclick="$('#signupbox').hide(); $('#loginbox').show()">Close</button>
+                      onclick="$('#signupbox').show(); $('#loginbox').hide();">Close</button>
                   </div>
 
                 </div>
@@ -231,6 +230,9 @@
         });
 
     }
+    var passMatch = 0;
+    var emailVerify = 0;
+    document.getElementById('message').innerHTML = '';
 
     function signup() {
       var name = document.getElementById("name").value;
@@ -245,17 +247,27 @@
         cpwd: password1
       }
       const request = new Request('http://localhost:3000/signup', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj1) });
+      document.getElementById("message4").innerHTML = "";
 
       fetch(request)
         .then(response => {
           if (response.status === 200) {
+            $('input').val('');
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('message1').innerHTML = '';
+            document.getElementById('message3').innerHTML = '';
+            document.getElementById('email1').style.borderColor = '#C0C0C0';
+            document.getElementById('namepas').style.borderColor = '#C0C0C0';
+            document.getElementById('password0').style.borderColor = '#C0C0C0';
+            document.getElementById('name').style.borderColor = '#C0C0C0';
             return response.json();
           } else {
             throw new Error('Something went wrong on api server!');
           }
         })
         .then(data => {
-          $('#modal').find('#r1').html(data.Message);
+          console.log(data.Message);
+          $('#modal1').html(data.Message);
         })
         .then(response => {
           console.debug(response);
@@ -263,9 +275,8 @@
         }).catch(error => {
           console.error(error);
         });
-
       $('#modal').modal('show');
-    }
+      }
 
     function passcheck() {
       var str = document.getElementById("password0").value;
@@ -304,8 +315,13 @@
       if (document.getElementById('password0').value ==
         document.getElementById('namepas').value) {
         document.getElementById('message').style.color = 'green';
+        document.getElementById('namepas').style.borderColor = 'green';
+        document.getElementById('password0').style.borderColor = 'green';
         document.getElementById('message').innerHTML = 'Password Matched';
+        passMatch = 1;
       } else {
+        passMatch = 0;
+        document.getElementById('namepas').style.borderColor = 'red';
         document.getElementById('message').style.color = 'red';
         document.getElementById('message').innerHTML = 'Not Matching';
       }
@@ -320,8 +336,14 @@
       var str = document.getElementById("email1").value;
       if(!isEmail(str)){
         document.getElementById('message3').style.color = 'red';
+        document.getElementById('email1').style.borderColor = 'red';
         document.getElementById('message3').innerHTML = 'Invalid email address';
-      }else document.getElementById('message3').innerHTML = '';
+        emailVerify = 0;
+      }else { 
+        document.getElementById('message3').innerHTML = '';
+        document.getElementById('email1').style.borderColor = 'green';
+        emailVerify = 1;
+      }
     }
   </script>
 
