@@ -1,7 +1,7 @@
 </html>
 
 <head>
-  <title>Add Request</title>
+  <title>Post A Request - Lyaen</title>
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
@@ -32,7 +32,8 @@
         }
       })
       .then(data => {
-        $("#name").text(data["name"]);
+        $("#name").text(data.name);
+        $("#points").text(data.points);
       })
       .then(response => {
         console.debug(response);
@@ -97,6 +98,12 @@
             <a class="nav-link" id="navbarDropdownMenuLink-4">
               <i class="fas fa-user"></i>
               <span id="name"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="navbarDropdownMenuLink-4">
+              <i class="fas fa-credit-card"></i>
+              <span id="points"></span>
             </a>
           </li>
           <li class="nav-item">

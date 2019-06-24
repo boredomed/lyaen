@@ -32,6 +32,7 @@
             })
             .then(data => {
                 $("#name").text(data["name"]);
+                $("#points").text(data["points"]);
             })
             .then(response => {
                 console.debug(response);
@@ -63,7 +64,7 @@
                     console.error(error);
                 });
         }
-        
+
     </script>
 </head>
 
@@ -89,10 +90,17 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto nav-flex-icons">
+
                     <li class="nav-item">
                         <a class="nav-link" id="navbarDropdownMenuLink-4">
                             <i class="fas fa-user"></i>
                             <span id="name"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="navbarDropdownMenuLink-4">
+                            <i class="fas fa-credit-card"></i>
+                            <span id="points"></span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -110,34 +118,33 @@
     <div class="container">
 
         <div class="row" style="margin: 60px; width:1400px;margin-left:390px">
-            <div id = "bb1" class="col-md-3 text-center">
-                <a id = "b1" href="/createVisit.html" style=" width: 300px"
+            <div id="bb1" class="col-md-3 text-center">
+                <a id="b1" href="/createVisit.html" style=" width: 300px"
                     class="btn btn-outline-info btn-lg btn-block waves-effect">
-                    Create Visit
+                    Post A Visit
                 </a>
             </div>
         </div>
         <div class="row" style="margin: 60px;width:1400px;margin-left:390px">
             <div class="col-md-3 text-center">
-                <a href="/visits.html" style=" width: 300px"
-                class="btn btn-outline-info btn-lg btn-block waves-effect">
-                    View Visits
+                <a href="/visits.html" style=" width: 300px" class="btn btn-outline-info btn-lg btn-block waves-effect">
+                    View My Visits
                 </a>
             </div>
         </div>
         <div class="row" style="margin: 60px;width:1400px;margin-left:390px">
             <div class="col-md-3 text-center">
                 <a href="/createRequest.html" style=" width: 300px"
-                class="btn btn-outline-info btn-lg btn-block waves-effect">
-                    Create Request
+                    class="btn btn-outline-info btn-lg btn-block waves-effect">
+                    Post A Request
                 </a>
             </div>
         </div>
         <div class="row" style="margin: 60px;width:1400px;margin-left:390px">
             <div class="col-md-3 text-center">
                 <a href="/requests.html" style=" width: 300px"
-                class="btn btn-outline-info btn-lg btn-block waves-effect">
-                    View Requests
+                    class="btn btn-outline-info btn-lg btn-block waves-effect">
+                    View My Requests
                 </a>
             </div>
         </div>
@@ -162,6 +169,6 @@
     <!-- MDB core JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/js/mdb.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-    </body>
+</body>
 
 </html>
