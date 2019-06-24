@@ -70,7 +70,8 @@
 
               <div class="col-sm-12 controls">
                 <a id="btn-login" href="#" class="btn btn-success" onclick="login()">Login </a>
-                <a id="btn-fblogin" href="#" class="btn btn-primary">Login with Facebook</a>
+                <span id = "emessage"></span>
+                <!-- <a id="btn-fblogin" href="#" class="btn btn-primary">Login with Facebook</a> -->
 
               </div>
             </div>
@@ -181,10 +182,10 @@
 
             <div style="border-top: 1px solid #999; padding-top:20px" class="form-group">
 
-              <div class="col-md-offset-3 col-md-9">
+              <!-- <div class="col-md-offset-3 col-md-9">
                 <button id="btn-fbsignup" type="button" class="btn btn-primary"><i class="icon-facebook"></i>   Sign Up
                   with Facebook</button>
-              </div>
+              </div> -->
 
             </div>
           </form>
@@ -219,7 +220,9 @@
             window.location.replace('/home.html');
           }
           else {
-
+            var mess = data["Message"];
+            document.getElementById("emessage").innerHTML = mess;
+            document.getElementById("emessage").style.color = "red";
           }
         })
         .then(response => {
@@ -289,7 +292,7 @@
       var num = new RegExp("[1-9]");
       var special = new RegExp("[{}/!@$%^&*()~]");
 
-      var colors = "white";
+      var colors = "#C0C0C0";
       var strengthn = "";
       var name = "Strength: ";
 
