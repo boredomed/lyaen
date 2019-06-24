@@ -8,7 +8,8 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
   <!-- Material Design Bootstrap -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.2/css/mdb.min.css" rel="stylesheet">
-
+  <!-- JQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
     const request = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
 
@@ -113,53 +114,51 @@
 
               <div id="visitalert" style="display:none" class="alert alert-danger">
                 <p>Error:</p>
-                <span></span>
+                <span id="errormsg"></span>
               </div>
 
               <!------------ Signup form data -------------->
               <div class="form-group">
-                <label for="description" class="col-md-6 control-label">Description</label>
+                <label for="description" class="col-md-6 control-label"><b>Description*</b></label>
                 <div class="col-md-9">
-                  <input id="description" type="text" class="form-control" name="description" placeholder="Description!"
-                    required>
+                  <input id="description" type="text" class="form-control" name="description" placeholder="Description!">
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="destination" class="col-md-6 control-label">Destination</label>
+                <label for="destination" class="col-md-6 control-label"><b>Destination*</b></label>
                 <div class="col-md-9">
-                  <input id="destination" type="text" class="form-control" name="destination" placeholder="Destination!"
-                    required>
+                  <input id="destination" type="text" class="form-control" name="destination" placeholder="Destination!">
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="maxrequests" class="col-md-6 control-label">Max Requests</label>
+                <label for="maxrequests" class="col-md-6 control-label"><b>Max Requests*</b></label>
                 <div class="col-md-9">
                   <input id="maxrequests" type="text" class="form-control" name="maxrequests"
-                    placeholder="Enter max number of requests!" required>
+                    placeholder="Enter max number of requests!" >
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="date" class="col-md-6 control-label">Date</label>
+                <label for="date" class="col-md-6 control-label"><b>Date*</b></label>
                 <div class="col-md-9">
-                  <input id="date" type="date" class="form-control" name="date" required>
+                  <input id="date" type="date" class="form-control" name="date" >
                 </div>
               </div>
 
               <div class="form-group">
-                <label for="time" class="col-md-6 control-label">Time</label>
+                <label for="time" class="col-md-6 control-label"><b>Time*</b></label>
                 <div class="col-md-9">
-                  <input id="time" type="time" class="form-control" name="time" required>
+                  <input id="time" type="time" class="form-control" name="time" >
                 </div>
               </div>
 
               <div class="form-group">
                 <!-- Button -->
                 <div class="col-md-offset-3 col-md-9">
-                  <button id="btn-visit" type="button" class="btn btn-info" onclick="visit()" data-toggle="modal"
-                    data-target="#modal"><i class="icon-hand-right"></i> &nbsp Register Visit &nbsp
+                  <button id="btn-visit" type="button" class="btn btn-info" onclick="visit()">
+                    <i class="icon-hand-right"></i> &nbsp Register Visit &nbsp
                   </button>
                 </div>
               </div>
@@ -182,13 +181,13 @@
           </div>
 
           <!-- Modal body -->
-          <div class="modal-body">
-            Visit Registration Successful!
+          <div id = "modal-body" class="modal-body">
+
           </div>
 
           <!-- Modal footer -->
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            <button id = "close-modal" type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
           </div>
 
         </div>
@@ -197,39 +196,55 @@
 
 
     <script type="text/javascript">
+
+      $("#close-modal").on('click', function(){
+        $('input').val("");
+        $("#modal").hide();
+      })
+      
       function visit() {
         var description = document.getElementById("description").value;
         var destination = document.getElementById("destination").value;
+        var maxrequests = document.getElementById('maxrequests').value;
         var date = document.getElementById('date').value;
         var time = document.getElementById('time').value;
-        var timestamp = date + " " + time + ":00";
-        var maxrequests = document.getElementById('maxrequests').value;
-        var obj = {
-          description: description,
-          destination: destination,
-          timestamp: timestamp,
-          maxrequests: maxrequests
+        if (!description && !destination && !maxrequests && !date && !time) {
+          document.getElementById("visitalert").style.display = '';
+          document.getElementById('errormsg').textContent = "All Fields are Required!"
         }
+        else {
+          document.getElementById("visitalert").style.display = 'none';
+          var timestamp = date + " " + time + ":00";
+          var obj = {
+            description: description,
+            destination: destination,
+            timestamp: timestamp,
+            maxrequests: maxrequests
+          }
 
-        const request = new Request('http://localhost:3000/visit', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
+          const request = new Request('http://localhost:3000/visit', { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' }, body: JSON.stringify(obj) });
 
-        fetch(request)
-          .then(response => {
-            if (response.status === 200) {
-              return response.json();
-            } else if (response.status === 401) {
-              window.location.replace("/");
-            } else {
-              throw new Error('Something went wrong on api server!');
-            }
-          })
-          .then(response => {
-            console.debug(response);
-            // ...
-          }).catch(error => {
-            console.error(error);
-          });
-
+          fetch(request)
+            .then(response => {
+              if (response.status === 200) {
+                return response.json();
+              } else if (response.status === 401) {
+                window.location.replace("/");
+              } else {
+                throw new Error('Something went wrong on api server!');
+              }
+            })
+            .then(data => {
+              $("#modal-body").html(data.Message);
+              $("#modal").show();
+            })
+            .then(response => {
+              console.debug(response);
+              // ...
+            }).catch(error => {
+              console.error(error);
+            });
+        }
       }
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>

@@ -12,8 +12,8 @@ app.use(cors());
 var db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "seecs@123",
-    database: "nodeapp"
+    password: "seecs123",
+    database: "lyaen"
 });
 
 db.connect(function (err) {
@@ -34,7 +34,7 @@ function validateName(name) {
 
 app.use(express.json());
 
-//client.auth("seecs123");
+client.auth("seecs123");
 app.use(session({
     secret: 'seecs123',
     saveUninitialized: true,
@@ -314,15 +314,15 @@ app.put('/visit', function (req, res) {
                         res.status(200).send({ "status": true, "Message": "Sorry! You cannot complete a visit. There are " + na_requests + " requests pending on your visit." })
                     }
                     else {
-                        var sql = "SELECT points from users WHERE ID = ?;";
-                        db.query(sql, [uid], function (err, result) {
+                        var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = ?;";
+                        db.query(sql, [vid], function (err, result) {
                             if (err) throw err;
-                            var previous_points = result[0]["points"];
-                            var sql = "SELECT count(*) as completed from requests WHERE status = 'Completed' and VID = ?;";
-                            db.query(sql, [vid], function (err, result) {
-                                if (err) throw err;
-                                var completed_requests = result[0]["completed"];
-                                if (completed_requests > 0) {
+                            var completed_requests = result[0]["completed"];
+                            if (completed_requests > 0) {
+                                var sql = "SELECT points from users WHERE ID = ?;";
+                                db.query(sql, [uid], function (err, result) {
+                                    if (err) throw err;
+                                    var previous_points = result[0]["points"];
                                     var points = (completed_requests * 5) + 5;
                                     points = previous_points + points;
                                     var sql = "UPDATE users SET points = ? WHERE ID = ?;";
@@ -334,8 +334,15 @@ app.put('/visit', function (req, res) {
                                             res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
                                         });
                                     });
-                                }
-                            });
+                                });
+                            }
+                            else {
+                                var sql = "UPDATE visits SET status = ? WHERE ID = ?;";
+                                db.query(sql, [comingstatus, vid], function (err, result) {
+                                    if (err) throw err;
+                                    res.status(200).send({ "status": true, "Message": "Visit Status Updated!" });
+                                });
+                            }
                         });
                     }
                 });
