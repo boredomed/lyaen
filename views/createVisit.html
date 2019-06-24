@@ -12,8 +12,8 @@
   <!-- JQuery -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script type="text/javascript">
-    const request = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
 
+    const request = new Request('http://localhost:3000/session', { method: 'GET', mode: 'cors', headers: { 'Content-Type': 'application/json;charset=UTF-8' } });
     fetch(request)
       .then(response => {
         if (response.status === 200) {
@@ -121,8 +121,7 @@
             <form id="visitform" class="form-horizontal" role="form">
 
               <div id="visitalert" style="display:none" class="alert alert-danger">
-                <p>Error:</p>
-                <span id="errormsg"></span>
+                <p id="errormsg"></p>
               </div>
 
               <!------------ Signup form data -------------->
@@ -145,7 +144,7 @@
               <div class="form-group">
                 <label for="maxrequests" class="col-md-6 control-label"><b>Max Requests*</b></label>
                 <div class="col-md-9">
-                  <input id="maxrequests" type="text" class="form-control" name="maxrequests"
+                  <input id="maxrequests" type="number" min="0" class="form-control" name="maxrequests"
                     placeholder="Enter max number of requests!">
                 </div>
               </div>
@@ -160,7 +159,7 @@
               <div class="form-group">
                 <label for="time" class="col-md-6 control-label"><b>Time*</b></label>
                 <div class="col-md-9">
-                  <input id="time" type="time" class="form-control" name="time">
+                  <input id="time" type="time" min="14:00:00" class="form-control" name="time">
                 </div>
               </div>
 
@@ -206,7 +205,22 @@
 
 
     <script type="text/javascript">
-
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+      var yyyy = today.getFullYear();
+      todaysdate = yyyy + '-' + mm + '-' + dd;
+      var hours = today.getHours();
+      var minutes = today.getMinutes();
+      if (minutes < 10) {
+        minutes = '0' + minutes;
+      }
+      if (hours < 10) {
+        hours = '0' + hours;
+      }
+      var todaystime = hours + ":" + minutes;
+      console.log(todaystime);
+      $("#date").attr('min', todaysdate);
       $("#close-modal").on('click', function () {
         $('input').val("");
         $("#modal").hide();
@@ -218,9 +232,22 @@
         var maxrequests = document.getElementById('maxrequests').value;
         var date = document.getElementById('date').value;
         var time = document.getElementById('time').value;
-        if (!description && !destination && !maxrequests && !date && !time) {
+        console.log(time);
+        if (!description || !destination || !maxrequests || !date || !time) {
           document.getElementById("visitalert").style.display = '';
-          document.getElementById('errormsg').textContent = "All Fields are Required!"
+          document.getElementById('errormsg').textContent = "Error: All Fields are Required!"
+        }
+        else if (maxrequests < 0) {
+          document.getElementById("visitalert").style.display = '';
+          document.getElementById('errormsg').textContent = "Error: Max Requests cannot be less than zero!"
+        }
+        else if (date < todaysdate) {
+          document.getElementById("visitalert").style.display = '';
+          document.getElementById('errormsg').textContent = "Error: Past Date cannot be selected!"
+        }
+        else if (time < todaystime) {
+          document.getElementById("visitalert").style.display = '';
+          document.getElementById('errormsg').textContent = "Error: Past Time cannot be selected!"
         }
         else {
           document.getElementById("visitalert").style.display = 'none';
