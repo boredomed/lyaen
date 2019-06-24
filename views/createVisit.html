@@ -235,19 +235,19 @@
         console.log(time);
         if (!description || !destination || !maxrequests || !date || !time) {
           document.getElementById("visitalert").style.display = '';
-          document.getElementById('errormsg').textContent = "Error: All Fields are Required!"
+          document.getElementById('errormsg').textContent = "Error: All Fields are Required!";
         }
         else if (maxrequests < 0) {
           document.getElementById("visitalert").style.display = '';
-          document.getElementById('errormsg').textContent = "Error: Max Requests cannot be less than zero!"
+          document.getElementById('errormsg').textContent = "Error: Max Requests cannot be less than zero!";
         }
         else if (date < todaysdate) {
           document.getElementById("visitalert").style.display = '';
-          document.getElementById('errormsg').textContent = "Error: Past Date cannot be selected!"
+          document.getElementById('errormsg').textContent = "Error: Past Date cannot be selected!";
         }
         else if (time < todaystime) {
           document.getElementById("visitalert").style.display = '';
-          document.getElementById('errormsg').textContent = "Error: Past Time cannot be selected!"
+          document.getElementById('errormsg').textContent = "Error: Past Time cannot be selected!";
         }
         else {
           document.getElementById("visitalert").style.display = 'none';
